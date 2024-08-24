@@ -1,0 +1,139 @@
+* {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: "stardew";
+  src: url("/fonts/stardew.ttf") format("truetype");
+}
+
+body {
+  background: #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#container {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  height: 20rem;
+}
+
+#water {
+  position: relative;
+  flex: 0 0 1.5rem;
+  height: 100%;
+  background-color: #6d95e6;
+  background-image: linear-gradient(to bottom, #b3d9ff, #4372de);
+  border: 3px solid #b9783b;
+}
+
+#fish {
+  position: absolute;
+  bottom: var(--position);
+  left: 50%;
+  margin-left: -12px;
+  height: 18px;
+  width: 24px;
+  background-image: url(/images/fish.png);
+  background-size: 75%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+
+  --position: 0%;
+}
+
+#player-bar {
+  position: absolute;
+  bottom: var(--position);
+  width: 100%;
+  height: var(--size);
+  background-color: #83e600;
+
+  --position: 0%;
+  --size: 25%;
+}
+
+#meter {
+  flex: 0 0 0.75rem;
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+  background-color: #64341f;
+  background-image: linear-gradient(to right, #8f502c, #64341f);
+  border: 3px solid #b9783b;
+  overflow: hidden;
+}
+
+#meter-bar {
+  width: 100%;
+  height: var(--size);
+  background-color: var(--color);
+
+  --color: #e08800;
+  --color-full: #83e600;
+  --color-empty: #ff6900;
+  --size: 20%;
+}
+
+#start-fishing-button {
+  font-family: stardew, sans-serif;
+  font-size: 1.5rem;
+  cursor: pointer;
+  width: auto;
+  white-space: nowrap;
+  height: auto;
+  padding: 0;
+  border: none;
+  padding-top: 24px;
+  background: transparent;
+  background-image: url(/images/fish.png);
+  background-size: 25px 25px;
+  background-position: 50% 0%;
+  background-repeat: no-repeat;
+}
+
+#caught-fish {
+  width: 48px;
+  height: 48px;
+  background-image: url(/images/fish.png);
+  background-size: 100%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}
+
+#lost,
+#waiting,
+#won {
+  font-family: stardew, sans-serif;
+  font-size: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+  user-select: none;
+}
+
+#container[data-status="waiting"] [data-game],
+#container[data-status="waiting"] [data-result] {
+  display: none;
+}
+
+#container[data-status="fishing"] [data-waiting],
+#container[data-status="fishing"] [data-result] {
+  display: none;
+}
+
+#container[data-status="lost"] [data-waiting],
+#container[data-status="lost"] [data-game],
+#container[data-status="lost"] #won {
+  display: none;
+}
+
+#container[data-status="won"] [data-waiting],
+#container[data-status="won"] [data-game],
+#container[data-status="won"] #lost {
+  display: none;
+}
