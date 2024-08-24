@@ -1,5 +1,5 @@
 import { getPlayerBar } from "../../dom";
-import { Fisherman } from "../../types";
+import { Fish, Fisherman } from "../../types";
 import { easeInQuad } from "../easing";
 
 export function initializeFisherman(fisherman: Fisherman) {

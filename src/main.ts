@@ -18,10 +18,6 @@ function run() {
     ...FISHERMAN_DEFAULTS,
   };
 
-  if (fisherman.fishingProgress !== 0) {
-    return;
-  }
-
   const container = getContainer();
   container.setAttribute("data-status", "fishing");
 

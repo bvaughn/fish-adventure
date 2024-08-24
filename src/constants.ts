@@ -5,15 +5,12 @@ export const FISH_DEFAULTS: Fish = {
   maxSpeed: 0.25,
   position: 0,
   restlessness: 0.25,
-  moveTimeStart: 0,
-  moveTimeStop: 0,
-  positionStart: 0,
-  positionStop: 0,
+  frameCount: 0,
 };
 
 export const FISHERMAN_DEFAULTS: Fisherman = {
-  barSize: 0.3,
-  fishingProgress: 0,
+  barSize: 0.25,
+  fishingProgress: 0.2,
   isReeling: false,
   barPosition: 0,
   reelStartPosition: 0,

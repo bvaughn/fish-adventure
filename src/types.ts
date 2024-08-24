@@ -8,10 +8,7 @@ export type Fish = {
   position: number;
 
   // State
-  moveTimeStart: number;
-  moveTimeStop: number;
-  positionStart: number;
-  positionStop: number;
+  frameCount: number;
 };
 
 export type Fisherman = {

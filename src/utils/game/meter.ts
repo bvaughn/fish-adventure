@@ -15,7 +15,7 @@ export function updateMeter(fisherman: Fisherman, fish: Fish): void {
 
   fisherman.fishingProgress = Math.max(
     0,
-    Math.min(1, fisherman.fishingProgress + (intersects ? 0.005 : -0.005))
+    Math.min(1, fisherman.fishingProgress + (intersects ? 0.005 : -0.004))
   );
 
   const element = getMeterBar();
