@@ -1,6 +1,6 @@
 import { getFish, getMeterBar, getPlayerBar } from "../../dom";
 import { getGradientHexColor } from "../color";
-import { registerRenderer } from "./renderer";
+import { registerRenderer } from "../renderer";
 
 export function initializeMeter({
   growSpeed = 0.0025,
@@ -21,6 +21,14 @@ export function initializeMeter({
   const colorStart = computedStyle.getPropertyValue("--color-empty");
   const colorEnd = computedStyle.getPropertyValue("--color-full");
 
+  const updateDOM = (progress: number) => {
+    element.style.setProperty(
+      "--color",
+      getGradientHexColor(fishingProgress, colorStart, colorEnd)
+    );
+    element.style.setProperty("--size", `${Math.round(progress * 100)}%`);
+  };
+
   const unregisterRenderer = registerRenderer(() => {
     const fishRect = fishElement.getBoundingClientRect();
     const barRect = barElement.getBoundingClientRect();
@@ -34,18 +42,14 @@ export function initializeMeter({
       Math.min(1, fishingProgress + (intersects ? growSpeed : 0 - shrinkSpeed))
     );
 
-    const color = getGradientHexColor(fishingProgress, colorStart, colorEnd);
-
-    element.style.setProperty("--color", color);
-    element.style.setProperty(
-      "--size",
-      `${Math.round(fishingProgress * 100)}%`
-    );
+    updateDOM(fishingProgress);
 
     if (fishingProgress === 0 || fishingProgress === 1) {
       onComplete?.(fishingProgress === 1);
     }
   });
+
+  updateDOM(0.2);
 
   return function destroy() {
     unregisterRenderer();

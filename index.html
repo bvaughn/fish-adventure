@@ -4,30 +4,27 @@
   </head>
   <body>
     <div id="container" data-status="waiting">
-      <div id="water" data-game>
+      <div class="game" data-game>
+      <div id="water">
         <div id="player-bar" data-size="25"></div>
         <div id="fish"></div>
       </div>
-      <div id="meter" data-game>
+      <div id="meter">
         <div id="meter-bar"></div>
       </div>
+    </div>
       <div id="waiting" data-waiting>
         <div>Click below when you're ready.</div>
-        <button id="start-fishing-button">Start fishing</button>
       </div>
       <div id="lost" data-result>
         <div>The fish got away!</div>
-        <div>Reload to try again.</div>
       </div>
       <div id="won" data-result>
         <div id="caught-fish"></div>
         <div>You caught a fish!</div>
-        <div>Reload to try again.</div>
       </div>
+      <button id="start-fishing-button">Start fishing</button>
     </div>
-
-    <div id="debug"></div>
-
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

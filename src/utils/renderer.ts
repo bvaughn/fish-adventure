@@ -1,3 +1,5 @@
+import raf from "raf";
+
 export type Renderer = (data: {
   deltaTimeMs: number;
   frameNumber: number;
@@ -19,6 +21,7 @@ export function unregisterAllRenderers(): void {
 
 let animationFrameId: number | null = null;
 let deltaTimeMs = 0;
+let isRendering = false;
 let lastAnimationFrameTime = 0;
 let frameNumber = 0;
 
@@ -33,32 +36,37 @@ function draw() {
   });
 }
 
-export function resetRendering() {
-  deltaTimeMs = 0;
-  frameNumber = 0;
-  lastAnimationFrameTime = 0;
-}
-
 export function startRendering() {
   lastAnimationFrameTime = Date.now();
 
+  isRendering = true;
+
   draw();
 
-  animationFrameId = requestAnimationFrame(onAnimationFrame);
+  animationFrameId = raf(onAnimationFrame);
+}
+
+export function pauseRendering() {
+  isRendering = false;
 }
 
 export function stopRendering() {
-  if (animationFrameId != null) {
-    cancelAnimationFrame(animationFrameId);
-  }
+  deltaTimeMs = 0;
+  frameNumber = 0;
+  isRendering = false;
+  lastAnimationFrameTime = 0;
 }
 
 function onAnimationFrame() {
+  if (!isRendering) {
+    return;
+  }
+
   deltaTimeMs += Date.now() - lastAnimationFrameTime;
   frameNumber++;
   lastAnimationFrameTime = Date.now();
 
   draw();
 
-  animationFrameId = requestAnimationFrame(onAnimationFrame);
+  animationFrameId = raf(onAnimationFrame);
 }

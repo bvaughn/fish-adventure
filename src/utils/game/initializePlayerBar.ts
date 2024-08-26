@@ -1,6 +1,6 @@
 import { getPlayerBar } from "../../dom";
 import { easeInQuad, easeOutBounce } from "../easing";
-import { registerRenderer } from "./renderer";
+import { registerRenderer } from "../renderer";
 
 export function initializePlayerBar({ barSize }: { barSize: number }) {
   let duration = 0;
@@ -9,8 +9,9 @@ export function initializePlayerBar({ barSize }: { barSize: number }) {
   let startTime = 0;
   let stopPosition = 0;
 
-  const element = getPlayerBar();
-  element.style.setProperty("--size", `${Math.round(barSize * 100)}%`);
+  const barElement = getPlayerBar();
+  barElement.style.setProperty("--size", `${Math.round(barSize * 100)}%`);
+  barElement.style.setProperty("--position", "0%");
 
   const activate = () => {
     duration = (1 - position) * 750;
@@ -24,6 +25,13 @@ export function initializePlayerBar({ barSize }: { barSize: number }) {
     startPosition = position;
     startTime = Date.now();
     stopPosition = 0;
+  };
+
+  const updateDOM = () => {
+    barElement.style.setProperty(
+      "--position",
+      `${Math.round(position * (1 - barSize) * 100)}%`
+    );
   };
 
   const unregisterRenderer = registerRenderer(() => {
@@ -45,17 +53,15 @@ export function initializePlayerBar({ barSize }: { barSize: number }) {
     if (position !== nextSafePosition) {
       position = nextSafePosition;
 
-      const element = getPlayerBar();
-      element.style.setProperty(
-        "--position",
-        `${Math.round(position * (1 - barSize) * 100)}%`
-      );
+      updateDOM();
     }
 
     if (Date.now() - startTime >= duration) {
       duration = 0;
     }
   });
+
+  updateDOM();
 
   window.addEventListener("keydown", activate);
   window.addEventListener("keyup", deactivate);

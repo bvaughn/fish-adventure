@@ -2,7 +2,7 @@ import { getContainer, getStartFishingButton } from "./dom";
 import { initializeFish } from "./utils/game/initializeFish";
 import { initializeMeter } from "./utils/game/initializeMeter";
 import { initializePlayerBar } from "./utils/game/initializePlayerBar";
-import { startRendering, stopRendering } from "./utils/game/renderer";
+import { startRendering, stopRendering } from "./utils/renderer";
 
 function run() {
   const container = getContainer();
@@ -25,6 +25,8 @@ function run() {
       destroyPlayerBar();
 
       container.setAttribute("data-status", won ? "won" : "lost");
+
+      stopRendering();
     },
   });
 

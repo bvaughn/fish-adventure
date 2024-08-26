@@ -8,6 +8,8 @@
 }
 
 body {
+  width: 100vw;
+  height: 100vh;
   background: #ddd;
   display: flex;
   align-items: center;
@@ -22,9 +24,17 @@ body {
 
 #container {
   display: flex;
-  flex-direction: row;
-  gap: 3px;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.game {
   height: 20rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: center;
 }
 
 #water {
@@ -93,12 +103,7 @@ body {
   height: auto;
   padding: 0;
   border: none;
-  padding-top: 24px;
   background: transparent;
-  background-image: url(/images/fish.png);
-  background-size: 25px 25px;
-  background-position: 50% 0%;
-  background-repeat: no-repeat;
 }
 
 #caught-fish {
@@ -128,7 +133,8 @@ body {
 }
 
 #container[data-status="fishing"] [data-waiting],
-#container[data-status="fishing"] [data-result] {
+#container[data-status="fishing"] [data-result],
+#container[data-status="fishing"] #start-fishing-button {
   display: none;
 }
 

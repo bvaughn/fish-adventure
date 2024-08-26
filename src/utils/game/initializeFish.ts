@@ -1,6 +1,6 @@
 import { getFish, getWater } from "../../dom";
 import { perlin2 as noise, seed } from "../noise";
-import { registerRenderer } from "./renderer";
+import { registerRenderer } from "../renderer";
 
 export function initializeFish({ speed = 0.0025 }: { speed?: number } = {}) {
   let calculatedSize = 0;
@@ -40,6 +40,15 @@ export function initializeFish({ speed = 0.0025 }: { speed?: number } = {}) {
 
   calculatedSize = fishHeight / waterHeight;
 
+  const updateDOM = () => {
+    const scaledPosition = position * (1 - calculatedSize);
+
+    fishElement.style.setProperty(
+      "--position",
+      `${Math.round(scaledPosition * 100)}%`
+    );
+  };
+
   const unregisterRenderer = registerRenderer(({ frameNumber }) => {
     frameNumber += frameOffset;
 
@@ -47,15 +56,11 @@ export function initializeFish({ speed = 0.0025 }: { speed?: number } = {}) {
     if (position != nextPosition) {
       position = nextPosition;
 
-      const scaledPosition = position * (1 - calculatedSize);
-
-      const element = getFish();
-      element.style.setProperty(
-        "--position",
-        `${Math.round(scaledPosition * 100)}%`
-      );
+      updateDOM();
     }
   });
+
+  updateDOM();
 
   return function destroy() {
     unregisterRenderer();
