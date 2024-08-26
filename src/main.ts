@@ -1,54 +1,34 @@
-import { FISH_DEFAULTS, FISHERMAN_DEFAULTS } from "./constants";
 import { getContainer, getStartFishingButton } from "./dom";
-import { Fish, Fisherman } from "./types";
-import { initializeFish, updateFish } from "./utils/game/fish";
-import {
-  initializeFisherman,
-  startFishing,
-  updateFisherman,
-} from "./utils/game/fisherman";
-import { updateMeter } from "./utils/game/meter";
+import { initializeFish } from "./utils/game/initializeFish";
+import { initializeMeter } from "./utils/game/initializeMeter";
+import { initializePlayerBar } from "./utils/game/initializePlayerBar";
+import { startRendering, stopRendering } from "./utils/game/renderer";
 
 function run() {
-  const fish: Fish = {
-    ...FISH_DEFAULTS,
-  };
-
-  const fisherman: Fisherman = {
-    ...FISHERMAN_DEFAULTS,
-  };
-
   const container = getContainer();
   container.setAttribute("data-status", "fishing");
 
-  initializeFish(fish);
-  initializeFisherman(fisherman);
+  const destroyFish = initializeFish({
+    speed: 0.0025,
+  });
 
-  const stopFishing = startFishing(fisherman);
+  const destroyPlayerBar = initializePlayerBar({
+    barSize: 0.25,
+  });
 
-  const interval = setInterval(function onTick() {
-    updateFisherman(fisherman);
-    updateFish(fish);
-    updateMeter(fisherman, fish);
+  const destroyMeter = initializeMeter({
+    onComplete: (won: boolean) => {
+      stopRendering();
 
-    // End game condition
-    switch (fisherman.fishingProgress) {
-      case 0: {
-        container.setAttribute("data-status", "lost");
+      destroyFish();
+      destroyMeter();
+      destroyPlayerBar();
 
-        stopFishing();
-        clearInterval(interval);
-        break;
-      }
-      case 1: {
-        container.setAttribute("data-status", "won");
+      container.setAttribute("data-status", won ? "won" : "lost");
+    },
+  });
 
-        stopFishing();
-        clearInterval(interval);
-        break;
-      }
-    }
-  }, 1_000 / 60);
+  startRendering();
 }
 
 const button = getStartFishingButton();
