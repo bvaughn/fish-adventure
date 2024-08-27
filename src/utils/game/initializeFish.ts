@@ -6,7 +6,6 @@ import { registerRenderer } from "../renderer";
 const DEGREES_OFFSET = 90;
 
 export function initializeFish({ speed = 0.0025 }: { speed?: number } = {}) {
-  let calculatedSize = 0;
   let positionX = 0;
   let positionY = 0;
 
@@ -15,19 +14,22 @@ export function initializeFish({ speed = 0.0025 }: { speed?: number } = {}) {
   // TODO Occasionally make the fish rest
   // TODO Rotate the fish in the direction it's "moving"
 
+  // Don't let the bar go past the edge of the water (visually)
   const waterElement = getWater();
+  const waterRect = waterElement.getBoundingClientRect();
   const fishElement = getFish();
+  const fishRect = fishElement.getBoundingClientRect();
 
-  const waterHeight = waterElement.clientHeight;
-  const fishHeight = fishElement.clientHeight;
-
-  calculatedSize = fishHeight / waterHeight;
+  const fishHeightPercentage = fishRect.height / waterRect.height;
+  const fishWidthPercentage = fishRect.width / waterRect.width;
 
   let prevX = 0;
   let prevY = 0;
   const updateDOM = () => {
-    const scaledPositionX = positionX * (1 - calculatedSize);
-    const scaledPositionY = positionY * (1 - calculatedSize);
+    const scaledPositionX =
+      fishWidthPercentage / 2 + positionX * (1 - fishWidthPercentage);
+    const scaledPositionY =
+      fishHeightPercentage / 2 + positionY * (1 - fishHeightPercentage);
 
     fishElement.style.setProperty(
       "--position-x",

@@ -2,6 +2,8 @@ import { getFish, getMeterBar, getPlayerBar } from "../../dom";
 import { getGradientHexColor } from "../color";
 import { registerRenderer } from "../renderer";
 
+// TODO Rate the fishing based on how often the fish is outside of the bar.
+
 export function initializeMeter({
   growSpeed = 0.0025,
   onComplete,

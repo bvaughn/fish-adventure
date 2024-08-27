@@ -20,8 +20,10 @@ function run() {
 
   const destroyMeter = initializeMeter({
     onComplete: (won: boolean) => {
-      return;
+      return; // TODO
       stopRendering();
+
+      // TODO Animate watery background and bubbles
 
       destroyFish();
       destroyMeter();
@@ -38,4 +40,5 @@ function run() {
 
 const button = getStartFishingButton();
 button.addEventListener("click", run);
-run();
+
+run(); // TODO

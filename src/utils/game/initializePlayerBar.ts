@@ -1,12 +1,12 @@
-import { getPlayerBar } from "../../dom";
+import { getPlayerBar, getWater } from "../../dom";
 import { registerRenderer } from "../renderer";
 import { createMoveable } from "../createMoveable";
 import { arrowKeyWatcher } from "../arrowKeyWatcher";
 
 export function initializePlayerBar({
-  accelerationRate = 3,
+  accelerationRate = 8,
   barSize,
-  friction = 1,
+  friction = 6,
   initialX = 0,
   initialY = 0,
   maxVelocity = 1,
@@ -18,28 +18,33 @@ export function initializePlayerBar({
   initialY?: number;
   maxVelocity?: number;
 }) {
-  // TODO Cap min/max based on measured bar size
+  const barElement = getPlayerBar();
+  barElement.style.setProperty("--size", `${barSize}rem`);
+  barElement.style.setProperty("--position", "0%");
+
+  // Don't let the bar go past the edge of the water (visually)
+  const waterElement = getWater();
+  const waterRect = waterElement.getBoundingClientRect();
+  const barRect = barElement.getBoundingClientRect();
+  const barHeightPercentage = barRect.height / waterRect.height;
+  const barWidthPercentage = barRect.width / waterRect.width;
 
   const movableX = createMoveable({
     friction,
     initialPosition: initialX,
-    maxPosition: 1,
-    minPosition: 0,
+    maxPosition: 1 - barWidthPercentage / 2,
+    minPosition: barWidthPercentage / 2,
     maxVelocity,
     minVelocity: -maxVelocity,
   });
   const movableY = createMoveable({
     friction,
     initialPosition: initialY,
-    maxPosition: 1,
-    minPosition: 0,
+    maxPosition: 1 - barHeightPercentage / 2,
+    minPosition: barHeightPercentage / 2,
     maxVelocity,
     minVelocity: -maxVelocity,
   });
-
-  const barElement = getPlayerBar();
-  barElement.style.setProperty("--size", `${barSize}rem`);
-  barElement.style.setProperty("--position", "0%");
 
   const destroyArrowKeyWatcher = arrowKeyWatcher((leftRight, upDown) => {
     switch (leftRight) {
