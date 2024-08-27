@@ -42,6 +42,10 @@ export function easeOutBounce(x: number): number {
   }
 }
 
+export function easeOutCirc(x: number): number {
+  return Math.sqrt(1 - Math.pow(x - 1, 2));
+}
+
 export function easeOutCubic(x: number): number {
   return 1 - Math.pow(1 - x, 3);
 }

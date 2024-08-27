@@ -1,4 +1,5 @@
 import raf from "raf";
+import { CancelScheduled, schedule } from "./scheduler";
 
 export type Renderer = (data: {
   deltaTimeMs: number;
@@ -19,7 +20,7 @@ export function unregisterAllRenderers(): void {
   renderers.clear();
 }
 
-let animationFrameId: number | null = null;
+let cancelScheduled: CancelScheduled | null = null;
 let deltaTimeMs = 0;
 let isRendering = false;
 let lastAnimationFrameTime = 0;
@@ -43,11 +44,15 @@ export function startRendering() {
 
   draw();
 
-  animationFrameId = raf(onAnimationFrame);
+  cancelScheduled = schedule(onAnimationFrame);
 }
 
 export function pauseRendering() {
   isRendering = false;
+
+  if (cancelScheduled) {
+    cancelScheduled();
+  }
 }
 
 export function stopRendering() {
@@ -55,6 +60,10 @@ export function stopRendering() {
   frameNumber = 0;
   isRendering = false;
   lastAnimationFrameTime = 0;
+
+  if (cancelScheduled) {
+    cancelScheduled();
+  }
 }
 
 function onAnimationFrame() {
@@ -68,5 +77,5 @@ function onAnimationFrame() {
 
   draw();
 
-  animationFrameId = raf(onAnimationFrame);
+  cancelScheduled = schedule(onAnimationFrame);
 }
