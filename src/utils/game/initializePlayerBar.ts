@@ -1,6 +1,7 @@
 import { getPlayerBar } from "../../dom";
 import { registerRenderer } from "../renderer";
 import { createMoveable } from "../createMoveable";
+import { arrowKeyWatcher } from "../arrowKeyWatcher";
 
 export function initializePlayerBar({
   accelerationRate = 3,
@@ -40,71 +41,38 @@ export function initializePlayerBar({
   barElement.style.setProperty("--size", `${barSize}rem`);
   barElement.style.setProperty("--position", "0%");
 
-  const onKeyDown = (event: KeyboardEvent) => {
-    switch (event.key) {
-      case "ArrowDown": {
-        if (movableY.getAcceleration() > -accelerationRate) {
-          movableY.setAcceleration(-accelerationRate);
-        }
-
-        event.preventDefault();
+  const destroyArrowKeyWatcher = arrowKeyWatcher((leftRight, upDown) => {
+    switch (leftRight) {
+      case "left": {
+        movableX.setAcceleration(-accelerationRate);
         break;
       }
-      case "ArrowLeft": {
-        if (movableX.getAcceleration() < accelerationRate) {
-          movableX.setAcceleration(-accelerationRate);
-        }
-
-        event.preventDefault();
+      case "right": {
+        movableX.setAcceleration(accelerationRate);
         break;
       }
-      case "ArrowRight": {
-        if (movableX.getAcceleration() > -accelerationRate) {
-          movableX.setAcceleration(accelerationRate);
-        }
-
-        event.preventDefault();
-        break;
-      }
-      case "ArrowUp": {
-        if (movableY.getAcceleration() < accelerationRate) {
-          movableY.setAcceleration(accelerationRate);
-        }
-
-        event.preventDefault();
+      default: {
+        movableX.setAcceleration(0);
         break;
       }
     }
-  };
 
-  const onKeyUp = (event: KeyboardEvent) => {
-    switch (event.key) {
-      case "ArrowDown": {
-        if (movableY.getAcceleration() === -accelerationRate) {
-          movableY.setAcceleration(0);
-        }
+    switch (upDown) {
+      case "down": {
+        movableY.setAcceleration(-accelerationRate);
         break;
       }
-      case "ArrowLeft": {
-        if (movableX.getAcceleration() === -accelerationRate) {
-          movableX.setAcceleration(0);
-        }
+      case "up": {
+        movableY.setAcceleration(accelerationRate);
         break;
       }
-      case "ArrowRight": {
-        if (movableX.getAcceleration() === accelerationRate) {
-          movableX.setAcceleration(0);
-        }
-        break;
-      }
-      case "ArrowUp": {
-        if (movableY.getAcceleration() === accelerationRate) {
-          movableY.setAcceleration(0);
-        }
+      default: {
+        movableY.setAcceleration(0);
         break;
       }
     }
-  };
+  });
+
   const unregisterRenderer = registerRenderer(() => {
     barElement.style.setProperty(
       "--position-x",
@@ -116,13 +84,14 @@ export function initializePlayerBar({
     );
   });
 
-  window.addEventListener("keyup", onKeyUp);
-  window.addEventListener("keydown", onKeyDown);
+  // window.addEventListener("keyup", onKeyUp);
+  // window.addEventListener("keydown", onKeyDown);
 
   return function destroy() {
     unregisterRenderer();
 
-    window.removeEventListener("keydown", onKeyDown);
-    window.removeEventListener("keyup", onKeyUp);
+    // window.removeEventListener("keydown", onKeyDown);
+    // window.removeEventListener("keyup", onKeyUp);
+    destroyArrowKeyWatcher();
   };
 }

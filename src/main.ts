@@ -13,7 +13,7 @@ function run() {
   });
 
   const destroyPlayerBar = initializePlayerBar({
-    barSize: 2,
+    barSize: 3,
     initialX: 0.5,
     initialY: 0.5,
   });
