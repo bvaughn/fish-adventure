@@ -1,9 +1,9 @@
-import raf from "raf";
 import { CancelScheduled, schedule } from "./scheduler";
 
 export type Renderer = (data: {
-  deltaTimeMs: number;
   frameNumber: number;
+  timeSinceLastFrameMs: number;
+  timeTotalMs: number;
 }) => void;
 
 const renderers = new Set<Renderer>();
@@ -21,15 +21,17 @@ export function unregisterAllRenderers(): void {
 }
 
 let cancelScheduled: CancelScheduled | null = null;
-let deltaTimeMs = 0;
 let isRendering = false;
-let lastAnimationFrameTime = 0;
 let frameNumber = 0;
+let lastAnimationFrameTime = 0;
+let timeSinceLastFrameMs = 0;
+let timeTotalMs = 0;
 
 function draw() {
   const data = {
-    deltaTimeMs,
     frameNumber,
+    timeSinceLastFrameMs,
+    timeTotalMs,
   };
 
   renderers.forEach((renderer) => {
@@ -56,7 +58,7 @@ export function pauseRendering() {
 }
 
 export function stopRendering() {
-  deltaTimeMs = 0;
+  timeTotalMs = 0;
   frameNumber = 0;
   isRendering = false;
   lastAnimationFrameTime = 0;
@@ -71,11 +73,13 @@ function onAnimationFrame() {
     return;
   }
 
-  deltaTimeMs += Date.now() - lastAnimationFrameTime;
   frameNumber++;
-  lastAnimationFrameTime = Date.now();
+  timeSinceLastFrameMs = Date.now() - lastAnimationFrameTime;
+  timeTotalMs += timeSinceLastFrameMs;
 
   draw();
+
+  lastAnimationFrameTime = Date.now();
 
   cancelScheduled = schedule(onAnimationFrame);
 }

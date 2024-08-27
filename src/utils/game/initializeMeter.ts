@@ -2,16 +2,19 @@ import { getFish, getMeterBar, getPlayerBar } from "../../dom";
 import { getGradientHexColor } from "../color";
 import { registerRenderer } from "../renderer";
 
+// Maybe make this a shooting game instead?
+// "Shooting fish in a barrel"?
+
 // TODO Rate the fishing based on how often the fish is outside of the bar.
 
 export function initializeMeter({
-  growSpeed = 0.0025,
   onComplete,
-  shrinkSpeed = 0.004,
+  timeToCatchMs = 3_000,
+  timeToEscapeMs = 2_000,
 }: {
-  growSpeed?: number;
   onComplete?: (won: boolean) => void;
-  shrinkSpeed?: number;
+  timeToCatchMs?: number;
+  timeToEscapeMs?: number;
 } = {}) {
   let fishingProgress = 0.2;
 
@@ -31,7 +34,10 @@ export function initializeMeter({
     element.style.setProperty("--size", `${Math.round(progress * 100)}%`);
   };
 
-  const unregisterRenderer = registerRenderer(() => {
+  const timeToCatchPerSecond = 1_000 / timeToCatchMs;
+  const timeToEscapePerSecond = 1_000 / timeToEscapeMs;
+
+  const unregisterRenderer = registerRenderer(({ timeSinceLastFrameMs }) => {
     const fishRect = fishElement.getBoundingClientRect();
     const barRect = barElement.getBoundingClientRect();
 
@@ -39,9 +45,13 @@ export function initializeMeter({
       barRect.bottom < fishRect.top || barRect.top > fishRect.bottom
     );
 
+    const deltaSinceLastFrame = intersects
+      ? (timeSinceLastFrameMs / 1_000) * timeToCatchPerSecond
+      : (timeSinceLastFrameMs / 1_000) * -timeToEscapePerSecond;
+
     fishingProgress = Math.max(
       0,
-      Math.min(1, fishingProgress + (intersects ? growSpeed : 0 - shrinkSpeed))
+      Math.min(1, fishingProgress + deltaSinceLastFrame)
     );
 
     updateDOM(fishingProgress);

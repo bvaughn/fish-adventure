@@ -8,6 +8,7 @@ function run() {
   const container = getContainer();
   container.setAttribute("data-status", "fishing");
 
+  // TODO Create several types of fish (visually different, different speeds)
   const destroyFish = initializeFish({
     speed: 0.0025,
   });
@@ -19,8 +20,9 @@ function run() {
   });
 
   const destroyMeter = initializeMeter({
+    // TODO Pass fish references
+
     onComplete: (won: boolean) => {
-      return; // TODO
       stopRendering();
 
       // TODO Animate watery background and bubbles
@@ -40,5 +42,3 @@ function run() {
 
 const button = getStartFishingButton();
 button.addEventListener("click", run);
-
-run(); // TODO
