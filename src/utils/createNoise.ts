@@ -1,4 +1,68 @@
-// Forked from https://raw.githubusercontent.com/josephg/noisejs/master/perlin.js
+// Forked from github/josephg/noisejs by Stefan Gustavson (stegu@itn.liu.se)
+
+export function createNoise(seed: number = Math.random()) {
+  // To remove the need for index wrapping, double the permutation table length
+  const perm = new Array(512);
+  const gradP = new Array(512);
+
+  // This isn't a very good seeding function, but it works ok. It supports 2^16
+  // different seed values. Write something better if you need more seeds.
+  function updateSeed(value: number) {
+    if (value > 0 && value < 1) {
+      // Scale the seed out
+      value *= 65536;
+    }
+
+    value = Math.floor(value);
+    if (value < 256) {
+      value |= value << 8;
+    }
+
+    for (let i = 0; i < 256; i++) {
+      var v;
+      if (i & 1) {
+        v = p[i] ^ (value & 255);
+      } else {
+        v = p[i] ^ ((value >> 8) & 255);
+      }
+
+      perm[i] = perm[i + 256] = v;
+      gradP[i] = gradP[i + 256] = grad3[v % 12];
+    }
+  }
+
+  updateSeed(seed);
+
+  // 2D Perlin Noise
+  function getValue(x: number, y: number) {
+    // Find unit grid cell containing point
+    let X = Math.floor(x),
+      Y = Math.floor(y);
+    // Get relative xy coordinates of point within that cell
+    x = x - X;
+    y = y - Y;
+    // Wrap the integer cells at 255 (smaller integer period can be introduced here)
+    X = X & 255;
+    Y = Y & 255;
+
+    // Calculate noise contributions from each of the four corners
+    const n00 = gradP[X + perm[Y]].dot2(x, y);
+    const n01 = gradP[X + perm[Y + 1]].dot2(x, y - 1);
+    const n10 = gradP[X + 1 + perm[Y]].dot2(x - 1, y);
+    const n11 = gradP[X + 1 + perm[Y + 1]].dot2(x - 1, y - 1);
+
+    // Compute the fade curve value for x
+    const u = fade(x);
+
+    // Interpolate the four results
+    const value = lerp(lerp(n00, n10, u), lerp(n01, n11, u), fade(y));
+
+    // Convert from -0.5...0.5 to 0...1
+    return value + 0.5;
+  }
+
+  return { getValue, updateSeed };
+}
 
 class Grad {
   x: number;
@@ -54,38 +118,6 @@ const p = [
   61, 156, 180,
 ];
 
-// To remove the need for index wrapping, double the permutation table length
-const perm = new Array(512);
-const gradP = new Array(512);
-
-// This isn't a very good seeding function, but it works ok. It supports 2^16
-// different seed values. Write something better if you need more seeds.
-export function seed(value: number) {
-  if (value > 0 && value < 1) {
-    // Scale the seed out
-    value *= 65536;
-  }
-
-  value = Math.floor(value);
-  if (value < 256) {
-    value |= value << 8;
-  }
-
-  for (var i = 0; i < 256; i++) {
-    var v;
-    if (i & 1) {
-      v = p[i] ^ (value & 255);
-    } else {
-      v = p[i] ^ ((value >> 8) & 255);
-    }
-
-    perm[i] = perm[i + 256] = v;
-    gradP[i] = gradP[i + 256] = grad3[v % 12];
-  }
-}
-
-seed(0);
-
 // Perlin noise stuff
 
 function fade(t: number) {
@@ -94,32 +126,4 @@ function fade(t: number) {
 
 function lerp(a: number, b: number, t: number) {
   return (1 - t) * a + t * b;
-}
-
-// 2D Perlin Noise
-export function perlin2(x: number, y: number) {
-  // Find unit grid cell containing point
-  var X = Math.floor(x),
-    Y = Math.floor(y);
-  // Get relative xy coordinates of point within that cell
-  x = x - X;
-  y = y - Y;
-  // Wrap the integer cells at 255 (smaller integer period can be introduced here)
-  X = X & 255;
-  Y = Y & 255;
-
-  // Calculate noise contributions from each of the four corners
-  var n00 = gradP[X + perm[Y]].dot2(x, y);
-  var n01 = gradP[X + perm[Y + 1]].dot2(x, y - 1);
-  var n10 = gradP[X + 1 + perm[Y]].dot2(x - 1, y);
-  var n11 = gradP[X + 1 + perm[Y + 1]].dot2(x - 1, y - 1);
-
-  // Compute the fade curve value for x
-  var u = fade(x);
-
-  // Interpolate the four results
-  const value = lerp(lerp(n00, n10, u), lerp(n01, n11, u), fade(y));
-
-  // Convert from -0.5...0.5 to 0...1
-  return value + 0.5;
 }

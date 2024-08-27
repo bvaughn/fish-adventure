@@ -13,11 +13,14 @@ function run() {
   });
 
   const destroyPlayerBar = initializePlayerBar({
-    barSize: 0.25,
+    barSize: 2,
+    initialX: 0.5,
+    initialY: 0.5,
   });
 
   const destroyMeter = initializeMeter({
     onComplete: (won: boolean) => {
+      return;
       stopRendering();
 
       destroyFish();
@@ -35,3 +38,4 @@ function run() {
 
 const button = getStartFishingButton();
 button.addEventListener("click", run);
+run();

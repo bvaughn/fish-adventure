@@ -1,36 +1,16 @@
 import { getFish, getWater } from "../../dom";
-import { perlin2 as noise, seed } from "../noise";
+import { createNoise } from "../createNoise";
 import { registerRenderer } from "../renderer";
 
 export function initializeFish({ speed = 0.0025 }: { speed?: number } = {}) {
   let calculatedSize = 0;
-  let frameOffset = 0;
-  let position = 0;
+  let positionX = 0;
+  let positionY = 0;
 
-  seed(Math.random());
+  const noise = createNoise();
 
-  // TODO It would also be good to stop the fish after a little while and then re-seed and restart it.
-
-  // TODO This is hacky because it's wasteful and might not even be close to 0
-  {
-    let minPosition = Number.MAX_VALUE;
-    let frameCountStart = 0;
-
-    for (let index = 0; index < 1000; index++) {
-      const value = noise(0, speed * index);
-      if (value < minPosition) {
-        minPosition = value;
-        frameCountStart = index;
-
-        if (value === 0) {
-          break;
-        }
-      }
-    }
-
-    frameOffset = frameCountStart;
-    position = minPosition;
-  }
+  // TODO Occasionally make the fish rest
+  // TODO Rotate the fish in the direction it's "moving"
 
   const waterElement = getWater();
   const fishElement = getFish();
@@ -41,23 +21,24 @@ export function initializeFish({ speed = 0.0025 }: { speed?: number } = {}) {
   calculatedSize = fishHeight / waterHeight;
 
   const updateDOM = () => {
-    const scaledPosition = position * (1 - calculatedSize);
+    const scaledPositionX = positionX * (1 - calculatedSize);
+    const scaledPositionY = positionY * (1 - calculatedSize);
 
     fishElement.style.setProperty(
-      "--position",
-      `${Math.round(scaledPosition * 100)}%`
+      "--position-x",
+      `${Math.round(scaledPositionX * 100)}%`
+    );
+    fishElement.style.setProperty(
+      "--position-y",
+      `${Math.round(scaledPositionY * 100)}%`
     );
   };
 
   const unregisterRenderer = registerRenderer(({ frameNumber }) => {
-    frameNumber += frameOffset;
+    positionX = noise.getValue(frameNumber * speed, 0);
+    positionY = noise.getValue(0, frameNumber * speed);
 
-    const nextPosition = noise(0, speed * frameNumber);
-    if (position != nextPosition) {
-      position = nextPosition;
-
-      updateDOM();
-    }
+    updateDOM();
   });
 
   updateDOM();

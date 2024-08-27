@@ -6,15 +6,30 @@ export function initializePlayerBar({
   accelerationRate = 3,
   barSize,
   friction = 1,
+  initialX = 0,
+  initialY = 0,
   maxVelocity = 1,
 }: {
   accelerationRate?: number;
   barSize: number;
   friction?: number;
+  initialX?: number;
+  initialY?: number;
   maxVelocity?: number;
 }) {
-  const movable = createMoveable({
+  // TODO Cap min/max based on measured bar size
+
+  const movableX = createMoveable({
     friction,
+    initialPosition: initialX,
+    maxPosition: 1,
+    minPosition: 0,
+    maxVelocity,
+    minVelocity: -maxVelocity,
+  });
+  const movableY = createMoveable({
+    friction,
+    initialPosition: initialY,
     maxPosition: 1,
     minPosition: 0,
     maxVelocity,
@@ -22,22 +37,38 @@ export function initializePlayerBar({
   });
 
   const barElement = getPlayerBar();
-  barElement.style.setProperty("--size", `${Math.round(barSize * 100)}%`);
+  barElement.style.setProperty("--size", `${barSize}rem`);
   barElement.style.setProperty("--position", "0%");
 
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key) {
-      case "ArrowUp": {
-        if (movable.getAcceleration() < accelerationRate) {
-          movable.setAcceleration(accelerationRate);
+      case "ArrowDown": {
+        if (movableY.getAcceleration() > -accelerationRate) {
+          movableY.setAcceleration(-accelerationRate);
         }
 
         event.preventDefault();
         break;
       }
-      case "ArrowDown": {
-        if (movable.getAcceleration() > -accelerationRate) {
-          movable.setAcceleration(-accelerationRate);
+      case "ArrowLeft": {
+        if (movableX.getAcceleration() < accelerationRate) {
+          movableX.setAcceleration(-accelerationRate);
+        }
+
+        event.preventDefault();
+        break;
+      }
+      case "ArrowRight": {
+        if (movableX.getAcceleration() > -accelerationRate) {
+          movableX.setAcceleration(accelerationRate);
+        }
+
+        event.preventDefault();
+        break;
+      }
+      case "ArrowUp": {
+        if (movableY.getAcceleration() < accelerationRate) {
+          movableY.setAcceleration(accelerationRate);
         }
 
         event.preventDefault();
@@ -48,15 +79,27 @@ export function initializePlayerBar({
 
   const onKeyUp = (event: KeyboardEvent) => {
     switch (event.key) {
-      case "ArrowUp": {
-        if (movable.getAcceleration() === accelerationRate) {
-          movable.setAcceleration(0);
+      case "ArrowDown": {
+        if (movableY.getAcceleration() === -accelerationRate) {
+          movableY.setAcceleration(0);
         }
         break;
       }
-      case "ArrowDown": {
-        if (movable.getAcceleration() === -accelerationRate) {
-          movable.setAcceleration(0);
+      case "ArrowLeft": {
+        if (movableX.getAcceleration() === -accelerationRate) {
+          movableX.setAcceleration(0);
+        }
+        break;
+      }
+      case "ArrowRight": {
+        if (movableX.getAcceleration() === accelerationRate) {
+          movableX.setAcceleration(0);
+        }
+        break;
+      }
+      case "ArrowUp": {
+        if (movableY.getAcceleration() === accelerationRate) {
+          movableY.setAcceleration(0);
         }
         break;
       }
@@ -64,13 +107,17 @@ export function initializePlayerBar({
   };
   const unregisterRenderer = registerRenderer(() => {
     barElement.style.setProperty(
-      "--position",
-      `${Math.round(movable.getPosition() * (1 - barSize) * 100)}%`
+      "--position-x",
+      `${Math.round(movableX.getPosition() * 100)}%`
+    );
+    barElement.style.setProperty(
+      "--position-y",
+      `${Math.round(movableY.getPosition() * 100)}%`
     );
   });
 
-  window.addEventListener("keydown", onKeyDown);
   window.addEventListener("keyup", onKeyUp);
+  window.addEventListener("keydown", onKeyDown);
 
   return function destroy() {
     unregisterRenderer();

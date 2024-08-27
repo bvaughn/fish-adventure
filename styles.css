@@ -40,23 +40,18 @@ body {
 #water {
   position: relative;
   box-sizing: content-box;
-  flex: 0 0 26px;
+  flex: 0 0 156px; /* 26 x 300 */
   height: 300px;
   background-color: #4372de;
   border: 3px solid #b9783b;
-}
-
-.water-foreground {
-  position: absolute;
-  bottom: 0;
-  width: 26px;
-  height: 300px;
+  background-image: url("/images/water.svg");
+  background-repeat: repeat-x;
 }
 
 #fish {
   position: absolute;
-  bottom: var(--position);
-  left: 50%;
+  bottom: var(--position-y);
+  left: var(--position-x);
   margin-left: -12px;
   height: 18px;
   width: 24px;
@@ -65,21 +60,22 @@ body {
   background-position: 50% 50%;
   background-repeat: no-repeat;
 
-  --position: 0%;
+  --position-x: 50%;
+  --position-y: 0%;
 }
 
 #player-bar {
   position: absolute;
-  left: 2px;
-  bottom: var(--position);
-  width: calc(100% - 4px);
+  left: calc(var(--position-x) - var(--size) / 2);
+  bottom: calc(var(--position-y) - var(--size) / 2);
+  width: var(--size);
   height: var(--size);
-  /* background-color: rgba(0, 0, 0, 0.2); */
   border: 2px solid rgba(0, 0, 0, 0.2);
   border-radius: 0.25rem;
 
-  --position: 0%;
-  --size: 25%;
+  --position-x: 50%;
+  --position-y: 50%;
+  --size: 2rem;
 }
 
 #meter {
