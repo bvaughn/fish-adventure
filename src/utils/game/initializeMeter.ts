@@ -1,6 +1,7 @@
 import { getFish, getMeterBar, getPlayerBar } from "../../dom";
 import { getGradientHexColor } from "../color";
 import { registerRenderer } from "../renderer";
+import { FishAPI } from "./initializeFish";
 
 // Maybe make this a shooting game instead?
 // "Shooting fish in a barrel"?
@@ -8,17 +9,20 @@ import { registerRenderer } from "../renderer";
 // TODO Rate the fishing based on how often the fish is outside of the bar.
 
 export function initializeMeter({
+  fish,
   onComplete,
   timeToCatchMs = 3_000,
   timeToEscapeMs = 2_000,
 }: {
+  fish: FishAPI[];
   onComplete?: (won: boolean) => void;
   timeToCatchMs?: number;
   timeToEscapeMs?: number;
-} = {}) {
+}) {
+  return;
   let fishingProgress = 0.2;
 
-  const fishElement = getFish();
+  const fishElement = getFish()[0];
   const barElement = getPlayerBar();
   const element = getMeterBar();
 

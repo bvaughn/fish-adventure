@@ -1,5 +1,5 @@
 export function getFish() {
-  return document.getElementById("fish") as HTMLDivElement;
+  return document.getElementsByClassName("fish");
 }
 
 export function getContainer() {

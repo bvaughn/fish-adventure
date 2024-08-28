@@ -4,7 +4,7 @@
 
 @font-face {
   font-family: "stardew";
-  src: url("/fonts/stardew.ttf") format("truetype");
+  src: url(/fonts/stardew.ttf) format("truetype");
 }
 
 body {
@@ -29,77 +29,60 @@ body {
 }
 
 .game {
-  height: 20rem;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 0.25rem;
   align-items: center;
   justify-content: center;
+  font-family: stardew, sans-serif;
 }
 
-#water {
+.water {
   position: relative;
   box-sizing: content-box;
-  flex: 0 0 156px; /* 26 x 300 */
+  width: 600px;
   height: 300px;
   background-color: #4372de;
   border: 3px solid #b9783b;
-  background-image: url("/images/water.svg");
+  background-image: url(/images/water.svg);
   background-repeat: repeat-x;
+  overflow: hidden;
+  cursor: none;
+
+  cursor:
+    url('data:image/svg+xml;utf8,<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" width="1" height="4" fill="black"/><rect x="17" y="8" width="1" height="4" transform="rotate(90 17 8)" fill="black"/><rect x="8" y="13" width="1" height="4" fill="black"/><rect x="4" y="8" width="1" height="4" transform="rotate(90 4 8)" fill="black"/><rect x="8" y="8" width="1" height="1" fill="black"/><rect x="2" y="1" width="4" height="1" fill="black"/><rect x="16" y="2" width="4" height="1" transform="rotate(90 16 2)" fill="black"/><rect x="2" y="15" width="4" height="1" fill="black"/><rect x="2" y="2" width="4" height="1" transform="rotate(90 2 2)" fill="black"/><rect x="11" y="1" width="4" height="1" fill="black"/><rect x="16" y="11" width="4" height="1" transform="rotate(90 16 11)" fill="black"/><rect x="11" y="15" width="4" height="1" fill="black"/><rect x="2" y="11" width="4" height="1" transform="rotate(90 2 11)" fill="black"/></svg>')
+      17 17,
+    auto;
 }
 
-#fish {
+.fish {
   position: absolute;
   bottom: var(--position-y);
   left: var(--position-x);
   margin-left: -12px;
-  height: 18px;
+  height: 24px;
   width: 24px;
-  background-image: url(/images/fish.png);
-  background-size: 75%;
+  background-size: 100%;
   background-position: 50% 50%;
   background-repeat: no-repeat;
-  rotate: var(--rotation);
+  /* rotate: var(--rotation); */
+  transform: rotate(45deg);
 
   --position-x: 50%;
   --position-y: 50%;
   --rotation: 0;
 }
+.fish[data-invert] {
+  /* transform: scale(-1, 1) rotate(calc(-180deg * var(--rotation))); */
+  transform: scale(-1, 1) rotate(45deg);
+}
 
-#player-bar {
+#crosshair {
   position: absolute;
-  left: calc(var(--position-x) - var(--size) / 2);
-  bottom: calc(var(--position-y) - var(--size) / 2);
-  width: var(--size);
-  height: var(--size);
-  border: 2px solid rgba(0, 0, 0, 0.2);
-  border-radius: 100%;
-
-  --position-x: 50%;
-  --position-y: 50%;
-  --size: 2rem;
-}
-
-#meter {
-  flex: 0 0 0.75rem;
-  display: flex;
-  align-items: flex-end;
-  height: 100%;
-  background-color: #64341f;
-  background-image: linear-gradient(to right, #8f502c, #64341f);
-  border: 3px solid #b9783b;
-  overflow: hidden;
-}
-
-#meter-bar {
-  width: 100%;
-  height: var(--size);
-  background-color: var(--color);
-
-  --color: #e08800;
-  --color-full: #83e600;
-  --color-empty: #ff6900;
-  --size: 20%;
+  width: 17px;
+  height: 17px;
+  background-image: url(/images/crosshair.svg);
+  background-repeat: no-repeat;
 }
 
 #start-fishing-button {

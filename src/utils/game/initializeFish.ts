@@ -1,69 +1,105 @@
-import { getFish, getWater } from "../../dom";
+import { getWater } from "../../dom";
 import { calculateAngle } from "../calculateAngle";
+import { calculateMovement } from "../calculateMovement";
 import { createNoise } from "../createNoise";
 import { registerRenderer } from "../renderer";
 
+export type FishAPI = ReturnType<typeof initializeFish>;
+
+let initialOffsetCounter = 0;
+
 const DEGREES_OFFSET = 90;
 
-export function initializeFish({ speed = 0.0025 }: { speed?: number } = {}) {
-  let positionX = 0;
-  let positionY = 0;
+export function initializeFish({
+  type,
+  velocityPixelsPerSecond = 100,
+}: {
+  type: string;
+  velocityPixelsPerSecond?: number;
+}) {
+  initialOffsetCounter += 10;
 
   const noise = createNoise();
 
   // TODO Occasionally make the fish rest
-  // TODO Rotate the fish in the direction it's "moving"
 
-  // Don't let the bar go past the edge of the water (visually)
   const waterElement = getWater();
   const waterRect = waterElement.getBoundingClientRect();
-  const fishElement = getFish();
-  const fishRect = fishElement.getBoundingClientRect();
 
-  const fishHeightPercentage = fishRect.height / waterRect.height;
-  const fishWidthPercentage = fishRect.width / waterRect.width;
+  const fishElement = document.createElement("div");
+  fishElement.className = "fish";
+  fishElement.style.backgroundImage = `url(/images/fish-${type}.png)`;
+
+  waterElement.appendChild(fishElement);
+
+  const fishRect = fishElement.getBoundingClientRect();
+  let positionX = fishRect.width / 2;
+  let positionY = fishRect.height / 2;
 
   let prevX = 0;
   let prevY = 0;
   const updateDOM = () => {
-    const scaledPositionX =
-      fishWidthPercentage / 2 + positionX * (1 - fishWidthPercentage);
-    const scaledPositionY =
-      fishHeightPercentage / 2 + positionY * (1 - fishHeightPercentage);
-
     fishElement.style.setProperty(
       "--position-x",
-      `${Math.round(scaledPositionX * 100)}%`
+      `${positionX * (waterRect.width - fishRect.width)}px`
     );
     fishElement.style.setProperty(
       "--position-y",
-      `${Math.round(scaledPositionY * 100)}%`
+      `${positionY * (waterRect.height - fishRect.height)}px`
     );
 
     const deltaX = positionX - prevX;
     const deltaY = positionY - prevY;
 
+    // TODO Don't flip upside down; reverse X axis
     const rotation = calculateAngle(deltaX, deltaY * -1, DEGREES_OFFSET);
-
-    document.getElementById("debug")!.innerText =
-      `${positionX.toFixed(3)}, ${positionY.toFixed(3)} -> ${rotation.toFixed(3)}`;
-
     fishElement.style.setProperty("--rotation", `${Math.round(rotation)}deg`);
+
+    if (deltaX < 0) {
+      fishElement.setAttribute("data-invert", "true");
+    } else {
+      fishElement.removeAttribute("data-invert");
+    }
 
     prevX = positionX;
     prevY = positionY;
   };
 
-  const unregisterRenderer = registerRenderer(({ frameNumber }) => {
-    positionX = noise.getValue(frameNumber * speed, 0);
-    positionY = noise.getValue(0, frameNumber * speed);
+  let scaledX = 0;
+  let scaledY = 0;
+
+  const unregisterRenderer = registerRenderer(({ timeSinceLastFrameMs }) => {
+    // Don't let the bar go past the edge of the water (visually)
+
+    scaledX += calculateMovement({
+      sizeInPixels: waterRect.width - fishRect.width,
+      timeInMilliseconds: timeSinceLastFrameMs,
+      velocityPixelsPerSecond,
+    });
+    scaledY += calculateMovement({
+      sizeInPixels: waterRect.height - fishRect.width,
+      timeInMilliseconds: timeSinceLastFrameMs,
+      velocityPixelsPerSecond,
+    });
+
+    positionX = noise.getValue(scaledX, initialOffsetCounter);
+    positionY = noise.getValue(initialOffsetCounter, scaledY);
 
     updateDOM();
   });
 
   updateDOM();
 
-  return function destroy() {
+  function destroy() {
     unregisterRenderer();
+  }
+
+  function getPosition(): [x: number, y: number] {
+    return [positionX, positionY];
+  }
+
+  return {
+    destroy,
+    getPosition,
   };
 }
