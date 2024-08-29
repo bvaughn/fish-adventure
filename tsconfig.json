@@ -10,9 +10,11 @@
     "noFallthroughCasesInSwitch": true,
     "module": "commonjs",
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "types": [
+      "vite/client",
+    ]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
   }
-  

@@ -1,31 +1,37 @@
-import { FISH } from "./constants";
-import { getContainer, getStartFishingButton } from "./dom";
-import { initializeFish } from "./utils/game/initializeFish";
-import { initializeMeter } from "./utils/game/initializeMeter";
-import { initializePlayerBar } from "./utils/game/initializePlayerBar";
-import { initializePlayerGun } from "./utils/game/initializePlayerGun";
-import { startRendering, stopRendering } from "./utils/renderer";
+import P5 from "p5";
+import { createGradient } from "./utils/p5/createGradient";
+import { Fish } from "./utils/p5/Fish";
 
-function run() {
-  const container = getContainer();
-  container.setAttribute("data-status", "fishing");
+new P5((api: P5) => {
+  const canvasWidth = Math.min(600, api.windowWidth);
+  const canvasHeight = Math.min(300, api.windowHeight);
 
-  const fish = new Array(10).fill(true).map((_, index) =>
-    initializeFish({
-      type: FISH[index % FISH.length],
-      velocityPixelsPerSecond: 50 + Math.random() * 50,
-    })
-  );
+  const SCALE = 5;
 
-  const destroyPlayerGun = initializePlayerGun({ fish });
+  const fish = new Fish(api, canvasWidth, canvasHeight, SCALE);
+  fish.moveableLocation.location.x = 100;
+  fish.moveableLocation.location.y = 100;
 
-  // TODO Cleanup
+  api.setup = () => {
+    api.frameRate(30);
+    api.createCanvas(canvasWidth, canvasHeight);
+    api.noStroke();
+  };
 
-  startRendering();
-}
+  api.draw = () => {
+    api.clear();
 
-const button = getStartFishingButton();
-button.addEventListener("click", run);
+    createGradient(
+      api,
+      api.color("#000055"),
+      api.color("#000022"),
+      0,
+      0,
+      canvasWidth,
+      canvasHeight,
+      "down"
+    );
 
-getContainer().className = "gaming"; // TODO
-run(); // TODO
+    fish.draw();
+  };
+}, document.body);

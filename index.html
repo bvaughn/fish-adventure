@@ -3,26 +3,22 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div id="container" data-status="waiting">
-      <div class="game" data-game>
-      <div id="water" class="water">
-        <div id="player-bar" data-size="25"></div>
-      </div>
-      <div>Shoot fish to win</div>
-    </div>
-      <div id="waiting" data-waiting>
-        <div>Click below when you're ready.</div>
-      </div>
-      <div id="lost" data-result>
-        <div>The fish got away!</div>
-      </div>
-      <div id="won" data-result>
-        <div id="caught-fish"></div>
-        <div>You caught a fish!</div>
-      </div>
-      <button id="start-fishing-button">Start fishing</button>
-    </div>
-    <div id="debug" style="position: absolute; right: 1rem; bottom: 1rem"></div>
+    <canvas id="root"></canvas>
     <script type="module" src="/src/main.ts"></script>
+
+    <!-- TESTING
+    <div style="position: absolute; bottom: 2rem; left: 2rem; display: flex; flex-direction: column; gap: 1rem;">
+      <img id="image" src="/images/fish-frame-1.svg" style="width: 96px; height: 96px"/>
+    </div>
+    <script>
+      const image = document.getElementById('image');
+      let frame = 1;
+      setInterval(() => {
+        frame++;
+
+        image.src = `/images/fish-frame-${frame % 2 + 1}.svg`;
+      }, 250);
+    </script>
+    TESTING -->
   </body>
 </html>

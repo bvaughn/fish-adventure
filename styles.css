@@ -2,141 +2,17 @@
   box-sizing: border-box;
 }
 
-@font-face {
-  font-family: "stardew";
-  src: url(/fonts/stardew.ttf) format("truetype");
 }
 
 body {
   width: 100vw;
   height: 100vh;
-  background: #ddd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-#debug {
-  position: absolute;
-  bottom: 1rem;
-  right: 1rem;
-}
-
-#container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.game {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  align-items: center;
-  justify-content: center;
-  font-family: stardew, sans-serif;
-}
-
-.water {
-  position: relative;
-  box-sizing: content-box;
-  width: 600px;
-  height: 300px;
-  background-color: #4372de;
-  border: 3px solid #b9783b;
-  background-image: url(/images/water.svg);
-  background-repeat: repeat-x;
-  overflow: hidden;
-  cursor: none;
-
-  cursor:
-    url('data:image/svg+xml;utf8,<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" width="1" height="4" fill="black"/><rect x="17" y="8" width="1" height="4" transform="rotate(90 17 8)" fill="black"/><rect x="8" y="13" width="1" height="4" fill="black"/><rect x="4" y="8" width="1" height="4" transform="rotate(90 4 8)" fill="black"/><rect x="8" y="8" width="1" height="1" fill="black"/><rect x="2" y="1" width="4" height="1" fill="black"/><rect x="16" y="2" width="4" height="1" transform="rotate(90 16 2)" fill="black"/><rect x="2" y="15" width="4" height="1" fill="black"/><rect x="2" y="2" width="4" height="1" transform="rotate(90 2 2)" fill="black"/><rect x="11" y="1" width="4" height="1" fill="black"/><rect x="16" y="11" width="4" height="1" transform="rotate(90 16 11)" fill="black"/><rect x="11" y="15" width="4" height="1" fill="black"/><rect x="2" y="11" width="4" height="1" transform="rotate(90 2 11)" fill="black"/></svg>')
-      17 17,
-    auto;
-}
-
-.fish {
-  position: absolute;
-  bottom: var(--position-y);
-  left: var(--position-x);
-  margin-left: -12px;
-  height: 24px;
-  width: 24px;
-  background-size: 100%;
-  background-position: 50% 50%;
-  background-repeat: no-repeat;
-  /* rotate: var(--rotation); */
-  transform: rotate(45deg);
-
-  --position-x: 50%;
-  --position-y: 50%;
-  --rotation: 0;
-}
-.fish[data-invert] {
-  /* transform: scale(-1, 1) rotate(calc(-180deg * var(--rotation))); */
-  transform: scale(-1, 1) rotate(45deg);
-}
-
-#crosshair {
-  position: absolute;
-  width: 17px;
-  height: 17px;
-  background-image: url(/images/crosshair.svg);
-  background-repeat: no-repeat;
-}
-
-#start-fishing-button {
-  font-family: stardew, sans-serif;
-  font-size: 1.5rem;
-  cursor: pointer;
-  width: auto;
-  white-space: nowrap;
-  height: auto;
-  padding: 0;
-  border: none;
-  background: transparent;
-}
-
-#caught-fish {
-  width: 48px;
-  height: 48px;
-  background-image: url(/images/fish.png);
-  background-size: 100%;
-  background-position: 50% 50%;
-  background-repeat: no-repeat;
-}
-
-#lost,
-#waiting,
-#won {
-  font-family: stardew, sans-serif;
-  font-size: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  align-items: center;
-  user-select: none;
-}
-
-#container[data-status="waiting"] [data-game],
-#container[data-status="waiting"] [data-result] {
-  display: none;
-}
-
-#container[data-status="fishing"] [data-waiting],
-#container[data-status="fishing"] [data-result],
-#container[data-status="fishing"] #start-fishing-button {
-  display: none;
-}
-
-#container[data-status="lost"] [data-waiting],
-#container[data-status="lost"] [data-game],
-#container[data-status="lost"] #won {
-  display: none;
-}
-
-#container[data-status="won"] [data-waiting],
-#container[data-status="won"] [data-game],
-#container[data-status="won"] #lost {
-  display: none;
+canvas{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
 }
