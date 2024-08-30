@@ -1,8 +1,10 @@
 import P5 from "p5";
 
-export type DrawCallback = (api: P5) => void;
+export type Callback = (api: P5) => void;
 
-const drawCallbacks: DrawCallback[] = [];
+const drawCallbacks: Callback[] = [];
+const preloadCallbacks: Callback[] = [];
+const setupCallbacks: Callback[] = [];
 
 export const size = {
   height: 0,
@@ -22,9 +24,15 @@ export const api: P5 = new P5((api: P5) => {
     api.resizeCanvas(size.width, size.height);
   };
 
+  api.preload = () => {
+    preloadCallbacks.forEach((callback) => callback(api));
+  };
+
   api.setup = () => {
     api.frameRate(30);
     api.createCanvas(size.width, size.height);
+
+    setupCallbacks.forEach((callback) => callback(api));
   };
 
   api.draw = () => {
@@ -32,13 +40,35 @@ export const api: P5 = new P5((api: P5) => {
   };
 });
 
-export function registerDraw(callback: DrawCallback) {
+export function registerDraw(callback: Callback) {
   drawCallbacks.push(callback);
 
   return function unregister() {
     const index = drawCallbacks.indexOf(callback);
     if (index !== -1) {
       drawCallbacks.splice(index, 1);
+    }
+  };
+}
+
+export function registerPreload(callback: Callback) {
+  preloadCallbacks.push(callback);
+
+  return function unregister() {
+    const index = preloadCallbacks.indexOf(callback);
+    if (index !== -1) {
+      preloadCallbacks.splice(index, 1);
+    }
+  };
+}
+
+export function registerSetup(callback: Callback) {
+  setupCallbacks.push(callback);
+
+  return function unregister() {
+    const index = setupCallbacks.indexOf(callback);
+    if (index !== -1) {
+      setupCallbacks.splice(index, 1);
     }
   };
 }

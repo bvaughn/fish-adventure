@@ -1,25 +1,36 @@
-import { api, registerDraw, size } from "../p5";
+import * as P5 from "p5";
+import { api, registerDraw, registerPreload, registerSetup, size } from "../p5";
 import { createMoveableLocation } from "../utils/createMoveableLocation";
+import { createSpriteSheet, SpriteSheet } from "../utils/p5/createSprite";
 import { drawScaledImage } from "../utils/p5/drawScaledImage";
-import { horizontallyFlipImage } from "../utils/p5/horizontallyFlipImage";
 import { initBubble } from "./initBubble";
 
+const SPRITE_HEIGHT = 10;
+const SPRITE_WIDTH = 18;
 const PIXELS_PER_SECOND = 2_500;
 
-export function initFish() {
-  const frames = [
-    api.loadImage("/images/fish-frame-1.svg"),
-    api.loadImage("/images/fish-frame-2.svg"),
-  ];
-  const frame = frames[0];
+let image: P5.Image;
+let spriteSheet: SpriteSheet;
 
+registerPreload((api) => {
+  image = api.loadImage("/images/sprites/fish.gif");
+});
+
+registerSetup((api) => {
+  spriteSheet = createSpriteSheet({
+    image,
+    spriteSize: { width: SPRITE_WIDTH, height: SPRITE_HEIGHT },
+  });
+});
+
+export function initFish() {
   let direction: "front" | "back" = "front";
 
   const maxLocation = api.createVector(0, 0);
 
   const updateMaxLocation = () => {
-    maxLocation.x = size.width - frame.width * size.pixelScale;
-    maxLocation.y = size.height - frame.height * size.pixelScale;
+    maxLocation.x = size.width - SPRITE_WIDTH * size.pixelScale;
+    maxLocation.y = size.height - SPRITE_HEIGHT * size.pixelScale;
   };
 
   updateMaxLocation();
@@ -51,7 +62,10 @@ export function initFish() {
       : api.frameCount % 30 < 15
         ? 0
         : 1;
-    let image = frames[frameIndex];
+    const image = spriteSheet.getFrame(
+      frameIndex,
+      direction === "front" ? 0 : 1
+    );
 
     // Simulate breathing with random bubbles every now and then
     if (api.frameCount % 45 === 0) {
@@ -60,25 +74,25 @@ export function initFish() {
         let x = moveableLocation.location.x;
         x += api.random(-size.pixelScale * 2, size.pixelScale * 2);
         if (direction === "front") {
-          x += image.width * size.pixelScale - size.pixelScale;
+          x += SPRITE_HEIGHT * size.pixelScale - size.pixelScale;
         }
 
         let y = moveableLocation.location.y;
         y += api.random(-size.pixelScale * 2, size.pixelScale * 2);
 
-        initBubble(x, y);
+        initBubble({
+          position: { x, y },
+          velocity: {
+            x: moveableLocation.velocity.x / 2,
+          },
+        });
       }
-    }
-
-    // Reverse direction if moving backwards
-    if (direction === "back") {
-      image = horizontallyFlipImage({ api: api, image });
     }
 
     moveableLocation.update();
 
     drawScaledImage({
-      api: api,
+      api,
       image,
       scale: size.pixelScale,
       translateX: moveableLocation.location.x,

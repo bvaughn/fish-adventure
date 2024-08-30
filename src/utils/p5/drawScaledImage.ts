@@ -32,7 +32,9 @@ export function drawScaledImage({
     x += xIncrement
   ) {
     for (let y = 0; y < image.height; y++) {
-      api.fill(image.get(x, y));
+      const color = image.get(x, y);
+
+      api.fill(color);
       if (x === xStart) {
       }
       api.rect(translateX + x * scale, translateY + y * scale, scale, scale);
