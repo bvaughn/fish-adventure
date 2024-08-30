@@ -5,40 +5,39 @@ import { createSpriteSheet, SpriteSheet } from "../utils/p5/createSprite";
 import { drawScaledImage } from "../utils/p5/drawScaledImage";
 import { initBubble } from "./initBubble";
 
-const SPRITE_HEIGHT = 10;
-const SPRITE_WIDTH = 18;
-const PIXELS_PER_SECOND = 2_500;
+const SPRITE_HEIGHT = 13;
+const SPRITE_WIDTH = 26;
+const PIXELS_PER_SECOND = 1_500;
 
 let image: P5.Image;
 let spriteSheet: SpriteSheet;
 
 registerPreload((api) => {
-  image = api.loadImage("/images/sprites/fish.gif");
+  image = api.loadImage("/images/sprites/fish-3.gif");
 });
 
-registerSetup((api) => {
+registerSetup(() => {
   spriteSheet = createSpriteSheet({
     image,
     spriteSize: { width: SPRITE_WIDTH, height: SPRITE_HEIGHT },
   });
 });
 
-export function initFish() {
-  let direction: "front" | "back" = "front";
+export function initNpcFish() {
+  const minLocation = api.createVector(0 - SPRITE_WIDTH * size.pixelScale, 0);
 
-  const maxLocation = api.createVector(0, 0);
-
-  const updateMaxLocation = () => {
-    maxLocation.x = size.width - SPRITE_WIDTH * size.pixelScale;
-    maxLocation.y = size.height - SPRITE_HEIGHT * size.pixelScale;
-  };
-
-  updateMaxLocation();
+  const rateOfBreathing = Math.round(api.random(35, 60));
+  const breathingFrameOffset = Math.round(api.random(0, rateOfBreathing));
 
   const moveableLocation = createMoveableLocation({
     api,
-    initialLocation: api.createVector(100, 100),
-    maxLocation,
+    friction: 0,
+    initialLocation: api.createVector(
+      api.random(0, size.width),
+      api.random(0, size.height)
+    ),
+    initialVelocity: api.createVector(api.random(-0.04, -0.08), 0),
+    minLocation,
     scale: PIXELS_PER_SECOND,
   });
 
@@ -46,36 +45,16 @@ export function initFish() {
     api.push();
     api.noStroke();
 
-    // In case of a resize
-    updateMaxLocation();
-
-    // Cache direct so that the fish doesn't flip back when at rest
-    if (moveableLocation.velocity.x < 0) {
-      direction = "back";
-    } else if (moveableLocation.velocity.x > 0) {
-      direction = "front";
-    }
-
     // Swim animation frames (if moving)
-    const frameIndex = moveableLocation.velocity.equals(0, 0)
-      ? 0
-      : api.frameCount % 30 < 15
-        ? 0
-        : 1;
-    const image = spriteSheet.getFrame(
-      frameIndex,
-      direction === "front" ? 0 : 1
-    );
+    const frameIndex = api.frameCount % 30 < 15 ? 0 : 1;
+    const image = spriteSheet.getFrame(frameIndex, 1);
 
     // Simulate breathing with random bubbles every now and then
-    if (api.frameCount % 45 === 0) {
+    if ((api.frameCount + breathingFrameOffset) % rateOfBreathing === 0) {
       const numBubbles = Math.round(api.random(1, 3));
       for (let i = 0; i < numBubbles; i++) {
         let x = moveableLocation.location.x;
         x += api.random(-size.pixelScale * 2, size.pixelScale * 2);
-        if (direction === "front") {
-          x += SPRITE_HEIGHT * size.pixelScale - size.pixelScale;
-        }
 
         let y = moveableLocation.location.y;
         y += api.random(-size.pixelScale * 2, size.pixelScale * 2);
@@ -89,7 +68,13 @@ export function initFish() {
       }
     }
 
+    const before = moveableLocation.location.x;
     moveableLocation.update();
+
+    if (moveableLocation.location.x === minLocation.x) {
+      moveableLocation.velocity.x = api.random(-0.04, -0.08);
+      moveableLocation.location.x = size.width;
+    }
 
     drawScaledImage({
       api,
@@ -102,7 +87,5 @@ export function initFish() {
     api.pop();
   });
 
-  return function destroy() {
-    moveableLocation.destroy();
-  };
+  return function destroy() {};
 }

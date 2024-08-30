@@ -6,6 +6,7 @@ export type SpriteSheet = {
   columnCount: number;
   frameCount: number;
   getFrame: (columnIndex: number, rowIndex: number) => P5.Image;
+  getRandomFrame: () => P5.Image;
   rowCount: number;
 };
 
@@ -34,6 +35,13 @@ export function createSpriteSheet({
     return columnIndex + rowIndex * columnCount;
   }
 
+  function getRandomFrame() {
+    const columnIndex = api.random(0, columnCount);
+    const rowIndex = api.random(0, rowCount);
+
+    return getFrame(columnIndex, rowIndex);
+  }
+
   function initializeFrame(columnIndex: number, rowIndex: number) {
     const index = getIndex(columnIndex, rowIndex);
     if (frames[index] == null) {
@@ -58,6 +66,7 @@ export function createSpriteSheet({
     columnCount,
     frameCount,
     getFrame,
+    getRandomFrame,
     rowCount,
   };
 }

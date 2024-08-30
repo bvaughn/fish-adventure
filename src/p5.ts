@@ -8,7 +8,7 @@ const setupCallbacks: Callback[] = [];
 
 export const size = {
   height: 0,
-  pixelScale: 5,
+  pixelScale: 2,
   width: 0,
 };
 

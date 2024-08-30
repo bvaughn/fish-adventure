@@ -3,15 +3,16 @@ import { createGradient } from "../utils/p5/createGradient";
 
 export function initBackground() {
   registerDraw(function drawBackground(api) {
-    createGradient(
+    createGradient({
       api,
-      api.color("#000055"),
-      api.color("#000022"),
-      0,
-      0,
-      size.width,
-      size.height,
-      "down"
-    );
+      blockSize: size.pixelScale * 10,
+      direction: "down",
+      fromColor: api.color("#5c63e0"),
+      toColor: api.color("#1e25a1"),
+      width: size.width,
+      x: 0,
+      y: 0,
+      height: size.height,
+    });
   });
 }

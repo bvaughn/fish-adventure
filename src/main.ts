@@ -1,5 +1,11 @@
 import { initBackground } from "./game/initBackground";
-import { initFish } from "./game/initFish";
+import { initNpcFish } from "./game/initNpcFish";
+import { initPlayerFish } from "./game/initPlayerFish";
 
 initBackground();
-initFish();
+
+for (let index = 0; index < 3; index++) {
+  initNpcFish();
+}
+
+initPlayerFish();

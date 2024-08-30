@@ -1,5 +1,4 @@
 import * as P5 from "p5";
-import { arrowKeyWatcher } from "./arrowKeyWatcher";
 
 export type MoveableLocation = ReturnType<typeof createMoveableLocation>;
 
@@ -7,58 +6,26 @@ export function createMoveableLocation({
   api,
   friction = 0.15,
   initialLocation = api.createVector(0, 0),
+  initialVelocity = api.createVector(0, 0),
   maxLocation,
   maxVelocity = 1,
   minLocation = api.createVector(0, 0),
   minVelocity = -1,
-  rateOfAcceleration = 0.25,
   scale = 1,
 }: {
   api: P5;
   friction?: number;
   initialLocation?: P5.Vector;
+  initialVelocity?: P5.Vector;
   maxLocation?: P5.Vector;
   maxVelocity?: number;
   minLocation?: P5.Vector;
   minVelocity?: number;
-  rateOfAcceleration?: number;
   scale?: number;
 }) {
   const acceleration = api.createVector(0, 0);
   const location = initialLocation;
-  const velocity = api.createVector(0, 0);
-
-  const destroy = arrowKeyWatcher((leftRight, upDown) => {
-    switch (leftRight) {
-      case "left": {
-        acceleration.x = -rateOfAcceleration;
-        break;
-      }
-      case "right": {
-        acceleration.x = rateOfAcceleration;
-        break;
-      }
-      default: {
-        acceleration.x = 0;
-        break;
-      }
-    }
-
-    switch (upDown) {
-      case "down": {
-        acceleration.y = rateOfAcceleration;
-        break;
-      }
-      case "up": {
-        acceleration.y = -rateOfAcceleration;
-        break;
-      }
-      default: {
-        acceleration.y = 0;
-        break;
-      }
-    }
-  });
+  const velocity = initialVelocity;
 
   function update() {
     const deltaTime = api.deltaTime;
@@ -153,7 +120,6 @@ export function createMoveableLocation({
 
   return {
     acceleration,
-    destroy,
     location,
     update,
     velocity,
