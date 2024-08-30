@@ -15,7 +15,7 @@ let image: P5.Image;
 let spriteSheet: SpriteSheet;
 
 registerPreload((api) => {
-  image = api.loadImage("/images/sprites/fish-2.gif");
+  image = api.loadImage("/images/sprites/fish-player.gif");
 });
 
 registerSetup(() => {
