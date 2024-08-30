@@ -11,8 +11,16 @@ export const size = {
 };
 
 export const api: P5 = new P5((api: P5) => {
-  size.width = Math.min(600, api.windowWidth);
-  size.height = Math.min(300, api.windowHeight);
+  size.width = api.windowWidth;
+  size.height = api.windowHeight;
+
+  api.windowResized = () => {
+    size.width = api.windowWidth;
+    console.log("RESIZE", size.height, "->", api.windowHeight);
+    size.height = api.windowHeight;
+
+    api.resizeCanvas(size.width, size.height);
+  };
 
   api.setup = () => {
     api.frameRate(30);

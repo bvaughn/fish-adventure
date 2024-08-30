@@ -11,19 +11,32 @@ export function initFish() {
     api.loadImage("/images/fish-frame-1.svg"),
     api.loadImage("/images/fish-frame-2.svg"),
   ];
+  const frame = frames[0];
 
   let direction: "front" | "back" = "front";
+
+  const maxLocation = api.createVector(0, 0);
+
+  const updateMaxLocation = () => {
+    maxLocation.x = size.width - frame.width * size.pixelScale;
+    maxLocation.y = size.height - frame.height * size.pixelScale;
+  };
+
+  updateMaxLocation();
 
   const moveableLocation = createMoveableLocation({
     api,
     initialLocation: api.createVector(100, 100),
-    maxLocation: api.createVector(size.width, size.height),
+    maxLocation,
     scale: PIXELS_PER_SECOND,
   });
 
   registerDraw(function drawFish(api) {
     api.push();
     api.noStroke();
+
+    // In case of a resize
+    updateMaxLocation();
 
     // Cache direct so that the fish doesn't flip back when at rest
     if (moveableLocation.velocity.x < 0) {
