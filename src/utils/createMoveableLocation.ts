@@ -1,5 +1,5 @@
 import * as P5 from "p5";
-import { arrowKeyWatcher } from "../arrowKeyWatcher";
+import { arrowKeyWatcher } from "./arrowKeyWatcher";
 
 export type MoveableLocation = ReturnType<typeof createMoveableLocation>;
 
