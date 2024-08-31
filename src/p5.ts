@@ -1,4 +1,5 @@
 import P5 from "p5";
+import { assert } from "./utils/assert";
 
 export type Callback = (api: P5) => void;
 
@@ -46,8 +47,12 @@ export const api: P5 = new P5((api: P5) => {
   };
 
   api.setup = () => {
+    const rootElement = document.getElementById("root");
+
+    assert(rootElement != null, "Root element not found");
+
     api.frameRate(frameRate);
-    api.createCanvas(size.width, size.height);
+    api.createCanvas(size.width, size.height, rootElement);
 
     callbacks.setup.forEach((callback) => callback(api));
   };

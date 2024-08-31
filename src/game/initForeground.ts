@@ -11,7 +11,7 @@ import { createAnimation } from "../utils/p5/createAnimation";
 import { createSpriteSheet, SpriteSheet } from "../utils/p5/createSpriteSheet";
 import { createNoise, Noise } from "../utils/createNoise";
 
-const MAX_HILL_HEIGHT_PIXELS = 4;
+const MAX_HILL_HEIGHT_PIXELS = 1;
 
 let noise: Noise;
 let seaweedImage: P5.Image;

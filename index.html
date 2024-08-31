@@ -4,21 +4,11 @@
   </head>
   <body>
     <canvas id="root"></canvas>
-    <script type="module" src="/src/main.ts"></script>
 
-    <!-- TESTING
-    <div style="position: absolute; bottom: 2rem; left: 2rem; display: flex; flex-direction: column; gap: 1rem;">
-      <img id="image" src="/images/fish-frame-1.svg" style="width: 96px; height: 96px"/>
+    <div class="instructions">
+      Hello little red fish! Swim by using the arrow keys (or WASD). Have fun!
     </div>
-    <script>
-      const image = document.getElementById('image');
-      let frame = 1;
-      setInterval(() => {
-        frame++;
 
-        image.src = `/images/fish-frame-${frame % 2 + 1}.svg`;
-      }, 250);
-    </script>
-    TESTING -->
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
