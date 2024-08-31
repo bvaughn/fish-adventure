@@ -38,13 +38,18 @@ registerSetup((api) => {
     spriteWidths: BACKGROUND_LAYER_2,
   });
 
-  // TODO Assign based on movement and scrolling
-  // TODO D.R.Y. this up
-  // TODO Randomize background mountains?
-  for (let index = 0; index < BACKGROUND_LAYER_1_SIZES.length; index++) {
+  // TODO Position/update items based on movement/scrolling
+  // This will require lazily generating positioned items as the window "moves"
+  // and then remembering them (if we allow scrolling back)
+
+  for (let index = 0; index < BACKGROUND_LAYER_1_SIZES.length * 3; index++) {
     bgLayer1Sprites.push({
-      index,
-      x: api.random(0, size.width - BACKGROUND_LAYER_1_SIZES[index]),
+      index: index % BACKGROUND_LAYER_1_SIZES.length,
+      x: api.random(
+        0,
+        size.width -
+          BACKGROUND_LAYER_1_SIZES[index % BACKGROUND_LAYER_1_SIZES.length]
+      ),
     });
   }
   for (let index = 0; index < BACKGROUND_LAYER_2.length; index++) {

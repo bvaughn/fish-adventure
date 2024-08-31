@@ -14,12 +14,17 @@ import { createSpriteSheet, SpriteSheet } from "../utils/p5/createSpriteSheet";
 import { drawScaledImage } from "../utils/p5/drawScaledImage";
 import { initBubble } from "./initBubble";
 
+// TODO Add more ways to control the fish;
+// Right now we support arrow keys and WASD
+// Ideally we would also support click/touch to move to a location
+// It's not clear how these two modes would interact/interfere with each other though!
+
 // TODO Share more code with initNpcFish
 // Swimming, breathing, etc are all too similar to have this much duplication
 
 const SPRITE_HEIGHT = 13;
 const SPRITE_WIDTH = 26;
-const PIXELS_PER_SECOND = 2_500;
+const PIXELS_PER_SECOND = 2_000;
 const RATE_OF_ACCELERATION = 0.25;
 
 let image: P5.Image;

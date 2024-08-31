@@ -58,6 +58,8 @@ export const api: P5 = new P5((api: P5) => {
   };
 
   api.draw = () => {
+    api.clear();
+
     callbacks.draw.forEach((layerCallbacks) => {
       layerCallbacks.forEach((callback) => {
         callback(api);

@@ -94,7 +94,7 @@ export function initNpcFish(variant: Size) {
     friction: 0,
     initialLocation: api.createVector(
       api.random(0, size.width),
-      api.random(0, size.height - fish.height)
+      api.random(0, size.height - fish.height * size.pixelScale)
     ),
     initialVelocity: api.createVector(
       api.random(-0.04 * fish.speedMultiplier, -0.08 * fish.speedMultiplier),
@@ -161,7 +161,10 @@ export function initNpcFish(variant: Size) {
       moveableLocation.velocity.x = api.random(-0.04, -0.08);
       moveableLocation.location.x = size.width;
 
-      moveableLocation.location.y = api.random(0, size.height - image.height);
+      moveableLocation.location.y = api.random(
+        0,
+        size.height - image.height * size.pixelScale
+      );
     }
 
     drawScaledImage({
