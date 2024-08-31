@@ -1,13 +1,14 @@
 import * as P5 from "p5";
+import { api as globalApi, size } from "../../p5";
 
 export function drawScaledImage({
-  api,
+  api = globalApi,
   image,
-  scale = 1,
+  scale = size.pixelScale,
   translateX = 0,
   translateY = 0,
 }: {
-  api: P5;
+  api?: P5;
   image: P5.Image;
   scale?: number;
   translateX?: number;

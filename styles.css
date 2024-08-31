@@ -2,14 +2,13 @@
   box-sizing: border-box;
 }
 
-}
-
 body {
   width: 100vw;
   height: 100vh;
+  background-color: #000d13;
 }
 
-canvas{
+canvas {
   position: fixed;
   top: 0;
   left: 0;

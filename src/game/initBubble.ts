@@ -1,6 +1,13 @@
 import * as P5 from "p5";
-import { api, registerDraw, registerPreload, registerSetup, size } from "../p5";
-import { createSpriteSheet, SpriteSheet } from "../utils/p5/createSprite";
+import {
+  api,
+  Layer,
+  registerDraw,
+  registerPreload,
+  registerSetup,
+  size,
+} from "../p5";
+import { createSpriteSheet, SpriteSheet } from "../utils/p5/createSpriteSheet";
 import { drawScaledImage } from "../utils/p5/drawScaledImage";
 
 const FRAMES_PER_SECOND = 2;
@@ -25,14 +32,18 @@ registerSetup(() => {
 });
 
 export function initBubble({
+  layer,
+  minIndex = 0,
   position: partialPosition,
   velocity: partialVelocity,
 }: {
+  layer: Layer;
+  minIndex?: number;
   position?: { x?: number; y?: number };
   velocity?: { x?: number; y?: number };
 }) {
   let rowIndex = Math.round(api.random(0, 1));
-  let startColumnIndex: number = Math.round(api.random(0, 2));
+  let startColumnIndex: number = Math.round(api.random(minIndex, 3));
   let startTime: number = performance.now();
 
   let position = api.createVector(
@@ -73,5 +84,5 @@ export function initBubble({
       translateX: position.x,
       translateY: position.y,
     });
-  });
+  }, layer);
 }

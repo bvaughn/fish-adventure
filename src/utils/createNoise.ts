@@ -1,5 +1,7 @@
 // Forked from github/josephg/noisejs by Stefan Gustavson (stegu@itn.liu.se)
 
+export type Noise = ReturnType<typeof createNoise>;
+
 export function createNoise(seed: number = Math.random()) {
   // To remove the need for index wrapping, double the permutation table length
   const perm = new Array(512);

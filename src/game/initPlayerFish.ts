@@ -1,10 +1,21 @@
 import * as P5 from "p5";
-import { api, registerDraw, registerPreload, registerSetup, size } from "../p5";
+import {
+  api,
+  PLAYER_LAYER,
+  registerDraw,
+  registerPreload,
+  registerResize,
+  registerSetup,
+  size,
+} from "../p5";
 import { arrowKeyWatcher } from "../utils/arrowKeyWatcher";
 import { createMoveableLocation } from "../utils/createMoveableLocation";
-import { createSpriteSheet, SpriteSheet } from "../utils/p5/createSprite";
+import { createSpriteSheet, SpriteSheet } from "../utils/p5/createSpriteSheet";
 import { drawScaledImage } from "../utils/p5/drawScaledImage";
 import { initBubble } from "./initBubble";
+
+// TODO Share more code with initNpcFish
+// Swimming, breathing, etc are all too similar to have this much duplication
 
 const SPRITE_HEIGHT = 13;
 const SPRITE_WIDTH = 26;
@@ -76,12 +87,13 @@ export function initPlayerFish() {
     }
   });
 
+  registerResize(() => {
+    updateMaxLocation();
+  });
+
   registerDraw(function drawFish(api) {
     api.push();
     api.noStroke();
-
-    // In case of a resize
-    updateMaxLocation();
 
     // Cache direct so that the fish doesn't flip back when at rest
     if (moveableLocation.velocity.x < 0) {
@@ -98,6 +110,7 @@ export function initPlayerFish() {
     );
 
     // Simulate breathing with random bubbles every now and then
+    // TODO More bubbles when moving faster, less when standing still
     if (api.frameCount % 45 === 0) {
       const numBubbles = Math.round(api.random(2, 8));
       for (let i = 0; i < numBubbles; i++) {
@@ -111,6 +124,7 @@ export function initPlayerFish() {
         y += api.random(-size.pixelScale * 2, size.pixelScale * 2);
 
         initBubble({
+          layer: PLAYER_LAYER,
           position: { x, y },
           velocity: {
             x: moveableLocation.velocity.x / 2,
@@ -130,7 +144,7 @@ export function initPlayerFish() {
     });
 
     api.pop();
-  });
+  }, PLAYER_LAYER);
 
   return function destroy() {
     destroyArrowKeyWatcher();
