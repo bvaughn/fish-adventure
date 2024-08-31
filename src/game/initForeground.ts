@@ -7,13 +7,13 @@ import {
   registerSetup,
   size,
 } from "../p5";
+import { generateHillData } from "../utils/generateHillData";
 import { createAnimation } from "../utils/p5/createAnimation";
 import { createSpriteSheet, SpriteSheet } from "../utils/p5/createSpriteSheet";
-import { createNoise, Noise } from "../utils/createNoise";
 
-const MAX_HILL_HEIGHT_PIXELS = 1;
+const MAX_HILL_HEIGHT_PIXELS = 4;
 
-let noise: Noise;
+let hillTextures: number[] = [];
 let seaweedImage: P5.Image;
 let seaweedSpriteSheet: SpriteSheet;
 
@@ -32,15 +32,15 @@ registerSetup((api) => {
     },
   });
 
-  // Small random hills
-  noise = createNoise();
+  // Small random hills in the foreground
+  hillTextures = generateHillData({
+    hillSectionPixelSize: 5,
+    splineNoise: 5,
+  });
 
   // Animated seaweeds
-  for (
-    let columnIndex = 0;
-    columnIndex < seaweedSpriteSheet.columnCount;
-    columnIndex++
-  ) {
+  for (let index = 0; index < seaweedSpriteSheet.columnCount * 3; index++) {
+    const columnIndex = index % seaweedSpriteSheet.columnCount;
     const frames = [
       seaweedSpriteSheet.getFrame(columnIndex, 0),
       seaweedSpriteSheet.getFrame(columnIndex, 1),
@@ -68,17 +68,19 @@ registerResize(() => {
 
 export function initForeground() {
   registerDraw(function drawBackground(api) {
+    api.noStroke();
+
     seaweedAnimations.forEach((animation) => {
       animation.draw();
     });
 
     // Draw small foreground hills
     api.fill("#000d13");
-    for (let x = 0; x < size.width; x += size.pixelScale) {
-      const value = noise.getValue(0.2 * x, 0);
+    hillTextures.forEach((value, index) => {
+      const x = index * size.pixelScale;
       const y = size.height - value * MAX_HILL_HEIGHT_PIXELS * size.pixelScale;
 
       api.rect(x, y, size.pixelScale, size.height - y);
-    }
+    });
   }, FOREGROUND_LAYER);
 }

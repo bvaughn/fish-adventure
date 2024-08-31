@@ -14,6 +14,9 @@ importers:
       approximately-equal:
         specifier: ^0.1.8
         version: 0.1.8
+      cubic-spline:
+        specifier: ^3.0.3
+        version: 3.0.3
       p5:
         specifier: ^1.10.0
         version: 1.10.0
@@ -503,6 +506,9 @@ packages:
   cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
     engines: {node: '>= 8'}
+
+  cubic-spline@3.0.3:
+    resolution: {integrity: sha512-yAvcHgrpf/k83pZiO4+R2reWOJlufgjpQhmDD3OXa8YMbjmRgjtUK8pcFOCZvJwqXaMD1isZdL7Z4ghqDPN/yw==}
 
   debug@4.3.5:
     resolution: {integrity: sha512-pt0bNEmneDIvdL1Xsd9oDQ/wrQRkXDT4AUWlNZNPKvW5x/jyO9VFXkJUP07vQ2upmw5PlaITaPKc31jK13V+jg==}
@@ -1284,6 +1290,8 @@ snapshots:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
+
+  cubic-spline@3.0.3: {}
 
   debug@4.3.5:
     dependencies:

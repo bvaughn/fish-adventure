@@ -6,84 +6,90 @@ import {
   registerSetup,
   size,
 } from "../p5";
+import { generateHillData } from "../utils/generateHillData";
 import {
   createIrregular2DSpriteSheet,
   Irregular2DSpriteSheet,
 } from "../utils/p5/createIrregular2DSpriteSheet";
 import { drawScaledImage } from "../utils/p5/drawScaledImage";
 
-const BACKGROUND_LAYER_1_SIZES = [160, 160, 160, 160];
-const BACKGROUND_LAYER_2 = [121, 26, 44];
+const BG_SPRITE_SIZES = [14, 39, 45, 29, 47];
+const BACKGROUND_HILL_1_HEIGHT_LIMIT = 50;
+const BACKGROUND_HILL_2_HEIGHT_LIMIT = 25;
 
-let bgLayer1Image: P5.Image;
-let bgLayer1SpriteSheet: Irregular2DSpriteSheet;
-let bgLayer2Image: P5.Image;
-let bgLayer2SpriteSheet: Irregular2DSpriteSheet;
+let bgImage: P5.Image;
+let bgSpriteSheet: Irregular2DSpriteSheet;
+let bgHill1: number[] = [];
+let bgHill2: number[] = [];
 
-const bgLayer1Sprites: Array<{ index: number; x: number }> = [];
-const bgLayer2Sprites: Array<{ index: number; x: number }> = [];
+const bgSprites: Array<{ index: number; x: number }> = [];
 
 registerPreload((api) => {
-  bgLayer1Image = api.loadImage("/images/sprites/background-layer-1.gif");
-  bgLayer2Image = api.loadImage("/images/sprites/background-layer-2.gif");
+  bgImage = api.loadImage("/images/sprites/background-layer-2.gif");
 });
 
 registerSetup((api) => {
-  bgLayer1SpriteSheet = createIrregular2DSpriteSheet({
-    image: bgLayer1Image,
-    spriteWidths: BACKGROUND_LAYER_1_SIZES,
+  bgSpriteSheet = createIrregular2DSpriteSheet({
+    image: bgImage,
+    spriteWidths: BG_SPRITE_SIZES,
   });
-  bgLayer2SpriteSheet = createIrregular2DSpriteSheet({
-    image: bgLayer2Image,
-    spriteWidths: BACKGROUND_LAYER_2,
+
+  bgHill1 = generateHillData({
+    hillSectionPixelSize: 10,
+    splineNoise: 3,
+  });
+  bgHill2 = generateHillData({
+    hillSectionPixelSize: 5,
+    splineNoise: 2,
   });
 
   // TODO Position/update items based on movement/scrolling
   // This will require lazily generating positioned items as the window "moves"
   // and then remembering them (if we allow scrolling back)
 
-  for (let index = 0; index < BACKGROUND_LAYER_1_SIZES.length * 3; index++) {
-    bgLayer1Sprites.push({
-      index: index % BACKGROUND_LAYER_1_SIZES.length,
-      x: api.random(
-        0,
-        size.width -
-          BACKGROUND_LAYER_1_SIZES[index % BACKGROUND_LAYER_1_SIZES.length]
-      ),
-    });
-  }
-  for (let index = 0; index < BACKGROUND_LAYER_2.length; index++) {
-    bgLayer2Sprites.push({
+  for (let index = 0; index < BG_SPRITE_SIZES.length; index++) {
+    bgSprites.push({
       index,
-      x: api.random(0, size.width - BACKGROUND_LAYER_2[index]),
+      x: api.random(0, size.width - BG_SPRITE_SIZES[index]),
     });
   }
 });
 
 export function initBackground() {
   registerDraw(function drawBackground(api) {
+    api.noStroke();
     api.fill("#008ca7");
     api.rect(0, 0, size.width, size.height);
 
     // Draw background to foreground (for layering)
 
-    bgLayer1Sprites.forEach(({ index, x }) => {
-      drawScaledImage({
-        api,
-        image: bgLayer1SpriteSheet.getSprite(index),
-        scale: size.pixelScale,
-        translateX: x,
-        translateY: size.height - bgLayer1Image.height * size.pixelScale,
-      });
+    api.fill("#077399");
+    bgHill1.forEach((value, index) => {
+      const x = index * size.pixelScale;
+      const height =
+        BACKGROUND_HILL_1_HEIGHT_LIMIT +
+        value * BACKGROUND_HILL_1_HEIGHT_LIMIT * size.pixelScale;
+      const y = size.height - height;
+
+      api.rect(x, y, size.pixelScale, size.height - y);
     });
 
-    bgLayer2Sprites.forEach(({ index, x }) => {
+    api.fill("#016186");
+    bgHill2.forEach((value, index) => {
+      const x = index * size.pixelScale;
+      const y =
+        size.height - value * BACKGROUND_HILL_2_HEIGHT_LIMIT * size.pixelScale;
+
+      api.rect(x, y, size.pixelScale, size.height - y);
+    });
+
+    bgSprites.forEach(({ index, x }) => {
       drawScaledImage({
         api,
-        image: bgLayer2SpriteSheet.getSprite(index),
+        image: bgSpriteSheet.getSprite(index),
         scale: size.pixelScale,
         translateX: x,
-        translateY: size.height - bgLayer2Image.height * size.pixelScale,
+        translateY: size.height - bgImage.height * size.pixelScale,
       });
     });
   }, BACKGROUND_LAYER_1);
