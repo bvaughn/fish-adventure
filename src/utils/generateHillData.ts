@@ -7,12 +7,10 @@ const noise = createNoise();
 
 export function generateHillData({
   hillSectionPixelSize = 10,
-  pixelScale = size.pixelScale,
   splineNoise = 0,
   width = size.width,
 }: {
   hillSectionPixelSize?: number;
-  pixelScale?: number;
   splineNoise?: number;
   width?: number;
 }) {
@@ -24,30 +22,36 @@ export function generateHillData({
     const perlin = noise.getPerlin2d(x * 0.005, 0);
     const simplex = noise.getSimplex2d(x, 0);
     xs.push(x);
-    ys.push((perlin + simplex) / 2);
+    // ys.push((perlin + simplex) / 2);
+    ys.push((perlin + simplex / 2) / 1.5);
   }
 
-  const maxIndex = width / pixelScale;
+  const maxIndex = width / size.pixelScale;
   const spline = new CubicSpline(xs, ys);
   const splinedValues: number[] = [];
   for (let index = 0; index < maxIndex; index++) {
-    let indexToUse = index;
+    let value = spline.at(index);
+
+    // let indexToUse = index;
     if (splineNoise !== 0) {
       if (Math.random() < splineNoise) {
-        const offset = Math.floor(Math.random() * splineNoise);
+        //     const offset = Math.floor(Math.random() * splineNoise);
+        const amount = Math.random() * (value * 0.05);
         const positive = Math.random() < 0.5;
 
-        indexToUse = Math.max(
-          0,
-          Math.min(
-            maxIndex - 1,
-            positive ? indexToUse + offset : indexToUse - offset
-          )
-        );
+        value = positive ? value + amount : value - amount;
+
+        //     indexToUse = Math.max(
+        //       0,
+        //       Math.min(
+        //         maxIndex - 1,
+        //         positive ? indexToUse + offset : indexToUse - offset
+        //       )
+        //     );
       }
     }
 
-    splinedValues.push(spline.at(indexToUse));
+    splinedValues.push(value);
   }
 
   return splinedValues;

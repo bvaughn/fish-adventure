@@ -11,7 +11,7 @@ import { generateHillData } from "../utils/generateHillData";
 import { createAnimation } from "../utils/p5/createAnimation";
 import { createSpriteSheet, SpriteSheet } from "../utils/p5/createSpriteSheet";
 
-const MAX_HILL_HEIGHT_PIXELS = 4;
+const MAX_HILL_HEIGHT_PIXELS = 5;
 
 let hillTextures: number[] = [];
 let seaweedImage: P5.Image;
@@ -35,7 +35,7 @@ registerSetup((api) => {
   // Small random hills in the foreground
   hillTextures = generateHillData({
     hillSectionPixelSize: 5,
-    splineNoise: 5,
+    splineNoise: 2,
   });
 
   // Animated seaweeds
