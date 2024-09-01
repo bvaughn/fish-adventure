@@ -1,4 +1,5 @@
-import P5 from "p5";
+import { Color } from "../Color";
+import { DrawingCanvas } from "../drawing/Canvas";
 
 export function createGradient({
   api,
@@ -11,12 +12,12 @@ export function createGradient({
   x,
   y,
 }: {
-  api: P5;
+  api: DrawingCanvas;
   blockSize?: number;
   direction: "down" | "left" | "right" | "up";
-  fromColor: P5.Color;
+  fromColor: Color;
   height: number;
-  toColor: P5.Color;
+  toColor: Color;
   width: number;
   x: number;
   y: number;

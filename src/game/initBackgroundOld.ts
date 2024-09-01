@@ -1,11 +1,9 @@
-import * as P5 from "p5";
 import {
   BACKGROUND_LAYER_1,
   registerDraw,
   registerPreload,
   registerSetup,
-  size,
-} from "../p5";
+} from "../drawing";
 import { generateHillData } from "../utils/generateHillData";
 import {
   createIrregular2DSpriteSheet,
@@ -13,6 +11,9 @@ import {
 } from "../utils/p5/createIrregular2DSpriteSheet";
 import { drawScaledImage } from "../utils/p5/drawScaledImage";
 import { createSpriteSheet, SpriteSheet } from "../utils/p5/createSpriteSheet";
+
+// TODO Drawing background images is killing performance
+// Need to find a better way to cache and only re-draw if it's changed
 
 const BG_SPRITE_SIZES = [14, 39, 45, 29, 47];
 // const BACKGROUND_HILL_1_HEIGHT_LIMIT = 60;
@@ -27,7 +28,7 @@ let bgSprites: Array<{ index: number; x: number }> = [];
 let bgHill1: number[] = [];
 let bgHill2: number[] = [];
 
-registerPreload((api) => {
+registerPreload(async () => {
   bgHillImage = api.loadImage("/images/sprites/background-layer-1.gif");
   bgImage = api.loadImage("/images/sprites/background-layer-2.gif");
 });

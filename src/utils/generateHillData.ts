@@ -1,6 +1,6 @@
 // @ts-ignore
 import CubicSpline from "cubic-spline";
-import { size } from "../p5";
+import { PIXEL_SCALE } from "../constants";
 import { createNoise } from "./createNoise";
 
 const noise = createNoise();
@@ -8,11 +8,11 @@ const noise = createNoise();
 export function generateHillData({
   hillSectionPixelSize = 10,
   splineNoise = 0,
-  width = size.width,
+  width,
 }: {
   hillSectionPixelSize?: number;
   splineNoise?: number;
-  width?: number;
+  width: number;
 }) {
   noise.updateSeed(Math.random());
 
@@ -26,7 +26,7 @@ export function generateHillData({
     ys.push((perlin + simplex / 2) / 1.5);
   }
 
-  const maxIndex = width / size.pixelScale;
+  const maxIndex = width / PIXEL_SCALE;
   const spline = new CubicSpline(xs, ys);
   const splinedValues: number[] = [];
   for (let index = 0; index < maxIndex; index++) {

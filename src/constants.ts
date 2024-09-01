@@ -4,3 +4,5 @@ export const COLORS = {
   REDS: ["#b63641", "#ff7f7f", "#fea8a2"],
   SHADOWS: ["#000000", "#000d13", "#162a33"],
 };
+export const FRAME_RATE = 30;
+export const PIXEL_SCALE = 2;

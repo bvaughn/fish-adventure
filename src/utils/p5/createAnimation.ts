@@ -22,6 +22,8 @@ export function createAnimation({
 
     const frame = frames[frameIndex];
 
+    // TODO Find a better way to cache and only re-draw if it's changed
+
     drawScaledImage({
       image: frame,
       translateX: location.x,

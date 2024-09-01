@@ -1,13 +1,11 @@
-import * as P5 from "p5";
-import { api } from "../../p5";
 import { Size } from "../../types";
 import { createIrregularSpriteSheet } from "./createIrregularSpriteSheet";
 
 export type SpriteSheet = {
   columnCount: number;
   frameCount: number;
-  getFrame: (columnIndex: number, rowIndex: number) => P5.Image;
-  getRandomFrame: () => P5.Image;
+  getFrame: (columnIndex: number, rowIndex: number) => Image;
+  getRandomFrame: () => Image;
   rowCount: number;
   spriteSize: Size;
 };
