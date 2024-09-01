@@ -101,9 +101,9 @@ export function initPlayerFish() {
     api.noStroke();
 
     // Cache direct so that the fish doesn't flip back when at rest
-    if (moveableLocation.velocity.x < 0) {
+    if (moveableLocation.acceleration.x < 0) {
       direction = "back";
-    } else if (moveableLocation.velocity.x > 0) {
+    } else if (moveableLocation.acceleration.x > 0) {
       direction = "front";
     }
 
