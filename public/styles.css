@@ -21,6 +21,7 @@ body {
 
 canvas {
   width: 100vw;
+  background-color: #008ca7;
 }
 
 .instructions {

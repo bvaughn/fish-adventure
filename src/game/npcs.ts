@@ -10,6 +10,7 @@ import { createMoveableLocation } from "../utils/createMoveableLocation";
 import { createSprites } from "../utils/drawing/spritesheets/createSprites";
 import { SpriteSheet } from "../utils/drawing/spritesheets/types";
 import { random } from "../utils/random";
+import { addBubble } from "./bubble";
 
 export type Variant = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
@@ -27,16 +28,18 @@ const PIXELS_PER_SECOND = 1_250;
 
 let spriteSheet: SpriteSheet;
 
-// Add some random acceleration/deceleration to the NPCs
+// TODO Animate NPC swimming
+
+// TODO Add some random acceleration/deceleration to the NPCs
 
 export function addNPC(variant: Variant) {
   const data = DIMENSIONS[variant - 1];
   assert(data, `Invalid variant: ${variant}`);
 
-  let sprite = spriteSheet.getSpriteAtCoordinates(data.x, data.y);
-  let speedMultiplier = 1;
+  const sprite = spriteSheet.getSpriteAtCoordinates(data.x, data.y);
 
   const minLocation = { x: 0 - sprite.width, y: 0 };
+  const rateOfBreathing = Math.round(random(0.5, 1.5) * 45);
 
   const moveableLocation = createMoveableLocation({
     friction: 0,
@@ -45,7 +48,7 @@ export function addNPC(variant: Variant) {
       y: random(0, canvas.height - sprite.height),
     },
     initialVelocity: {
-      x: random(-0.04 * speedMultiplier, -0.08 * speedMultiplier),
+      x: random(-0.02, -0.07),
       y: 0,
     },
     minLocation,
@@ -68,6 +71,29 @@ export function addNPC(variant: Variant) {
       moveableLocation.location.x,
       moveableLocation.location.y
     );
+
+    // Simulate breathing with random bubbles every now and then
+    // TODO More bubbles when moving faster, less when standing still
+    // TODO Move this code into the createAnimatedFishSpriteHelper?
+    if (data.frameNumber % rateOfBreathing === 0) {
+      const numBubbles = Math.round(random(1, 4));
+      for (let i = 0; i < numBubbles; i++) {
+        let x = moveableLocation.location.x;
+        x += random(-2, 2);
+
+        let y = moveableLocation.location.y;
+        y += random(-2, 2);
+
+        addBubble({
+          layer: BACKGROUND_LAYER_3,
+          partialPosition: { x, y },
+          partialVelocity: {
+            x: moveableLocation.velocity.x / 2,
+          },
+          size: "regular",
+        });
+      }
+    }
   }, BACKGROUND_LAYER_3);
 }
 
