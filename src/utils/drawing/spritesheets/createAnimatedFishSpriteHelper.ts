@@ -9,7 +9,7 @@ import { createSpritesFromGrid } from "./createSpritesFromGrid";
 import { GridSpriteSheet } from "./types";
 
 export type AnimatedFishSpriteHelper = {
-  getSprite(direction: "forward" | "backward"): Sprite;
+  getSprite(direction: "forward" | "backward", isMoving: boolean): Sprite;
   size: Size;
 };
 
@@ -56,7 +56,7 @@ export function createAnimatedFishSpriteHelper({
             spriteSheet.getSpriteInCell(2, 1),
             spriteSheet.getSpriteInCell(3, 1),
           ],
-          framesPerSecond: 2,
+          framesPerSecond: 3,
         }),
         still: createAnimatedSpriteHelper({
           frames: [
@@ -72,7 +72,7 @@ export function createAnimatedFishSpriteHelper({
             spriteSheet.getSpriteInCell(2, 0),
             spriteSheet.getSpriteInCell(3, 0),
           ],
-          framesPerSecond: 2,
+          framesPerSecond: 3,
         }),
         still: createAnimatedSpriteHelper({
           frames: [

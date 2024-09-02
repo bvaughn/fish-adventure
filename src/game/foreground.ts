@@ -17,6 +17,8 @@ import { generateHillData } from "../utils/generateHillData";
 // TODO Scrollable map width (lazily generated?)
 // Density of seaweed should be per-pixel
 
+// TODO Occasional big bubbles
+
 const TEXTURE_HEIGHT = 5;
 
 export function initForeground() {

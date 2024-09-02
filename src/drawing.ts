@@ -56,6 +56,13 @@ function registerCallbackHelper(callback: Function, callbacks: Function[]) {
   };
 }
 
+export function unregisterAll() {
+  callbacks.draw = new Array<Array<DrawCallback>>([], [], [], [], [], [], []);
+  callbacks.preload = [];
+  callbacks.resize = [];
+  callbacks.setup = [];
+}
+
 export async function runPreload() {
   for (const callback of callbacks.preload) {
     await callback();

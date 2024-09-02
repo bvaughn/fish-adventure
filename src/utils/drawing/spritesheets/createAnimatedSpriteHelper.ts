@@ -1,8 +1,9 @@
-import { frameRateToIndex } from "../frameRateToIndex";
+import { timestamp } from "../../../scheduler";
 import { Sprite } from "../Sprites";
 
 export type AnimatedSpriteHelper = {
   getFrame(): Sprite;
+  getFrameIndex(): number;
 };
 
 export function createAnimatedSpriteHelper({
@@ -12,17 +13,33 @@ export function createAnimatedSpriteHelper({
   frames: Sprite[];
   framesPerSecond?: number;
 }): AnimatedSpriteHelper {
-  let frameIndex = 0;
+  const frameCount = frames.length;
+  const thresholdMs = Math.floor(1_000 / framesPerSecond);
+
+  let prevFrameIndex = 0;
+  let prevFrameUpdatedAtTime = timestamp;
+
+  function getFrameIndex() {
+    const elapsedMs = timestamp - prevFrameUpdatedAtTime;
+
+    const frameIndex =
+      elapsedMs >= thresholdMs
+        ? (prevFrameIndex + 1) % frameCount
+        : prevFrameIndex % frameCount;
+
+    if (prevFrameIndex !== frameIndex) {
+      prevFrameIndex = frameIndex;
+      prevFrameUpdatedAtTime = timestamp;
+    }
+
+    return frameIndex;
+  }
 
   function getFrame() {
-    frameIndex = frameRateToIndex({
-      frameCount: frames.length,
-      framesPerSecond,
-      prevFrameIndex: frameIndex,
-    });
+    const frameIndex = getFrameIndex();
 
     return frames[frameIndex];
   }
 
-  return { getFrame };
+  return { getFrame, getFrameIndex };
 }

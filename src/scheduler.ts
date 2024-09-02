@@ -22,6 +22,10 @@ let lastAnimationFrameTime = performance.now();
 let scheduledCallbacks: Callback[] = [];
 let timeoutId: NodeJS.Timeout | null = null;
 
+export function isRunning() {
+  return animationFrameId !== null || timeoutId !== null;
+}
+
 export function pause() {
   if (animationFrameId !== null) {
     raf.cancel(animationFrameId);
@@ -44,6 +48,8 @@ export function start() {
   if (animationFrameId !== null || timeoutId !== null) {
     return;
   }
+
+  lastAnimationFrameTime = performance.now();
 
   animationFrameId = raf(onAnimationFrame);
 }

@@ -11,19 +11,12 @@ import { createSprites } from "../utils/drawing/spritesheets/createSprites";
 import { SpriteSheet } from "../utils/drawing/spritesheets/types";
 import { random } from "../utils/random";
 import { addBubble } from "./bubble";
+import {
+  Variant,
+  createAnimatedNpcFishSpriteHelper,
+  initAnimatedNpcFishSpriteHelper,
+} from "../utils/drawing/spritesheets/createAnimatedNpcFishSpriteHelper";
 
-export type Variant = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-
-const DIMENSIONS = [
-  { x: 0, y: 0, width: 22, height: 8 },
-  { x: 0, y: 10, width: 23, height: 24 },
-  { x: 0, y: 36, width: 26, height: 12 },
-  { x: 0, y: 50, width: 25, height: 20 },
-  { x: 0, y: 72, width: 30, height: 12 },
-  { x: 0, y: 86, width: 21, height: 17 },
-  { x: 0, y: 105, width: 26, height: 16 },
-  { x: 0, y: 123, width: 26, height: 18 },
-];
 const PIXELS_PER_SECOND = 1_250;
 
 let spriteSheet: SpriteSheet;
@@ -33,19 +26,16 @@ let spriteSheet: SpriteSheet;
 // TODO Add some random acceleration/deceleration to the NPCs
 
 export function addNPC(variant: Variant) {
-  const data = DIMENSIONS[variant - 1];
-  assert(data, `Invalid variant: ${variant}`);
+  const helper = createAnimatedNpcFishSpriteHelper(variant);
 
-  const sprite = spriteSheet.getSpriteAtCoordinates(data.x, data.y);
-
-  const minLocation = { x: 0 - sprite.width, y: 0 };
+  const minLocation = { x: 0 - helper.size.width, y: 0 };
   const rateOfBreathing = Math.round(random(0.5, 1.5) * 45);
 
   const moveableLocation = createMoveableLocation({
     friction: 0,
     initialLocation: {
       x: random(0, canvas.width),
-      y: random(0, canvas.height - sprite.height),
+      y: random(0, canvas.height - helper.size.height),
     },
     initialVelocity: {
       x: random(-0.02, -0.07),
@@ -63,9 +53,13 @@ export function addNPC(variant: Variant) {
       moveableLocation.velocity.x = random(-0.04, -0.08);
       moveableLocation.location.x = canvas.width;
 
-      moveableLocation.location.y = random(0, canvas.height - sprite.height);
+      moveableLocation.location.y = random(
+        0,
+        canvas.height - helper.size.height
+      );
     }
 
+    const sprite = helper.getSprite();
     canvas.drawSprite(
       sprite,
       moveableLocation.location.x,
@@ -98,16 +92,7 @@ export function addNPC(variant: Variant) {
 }
 
 export function initNPCs() {
-  registerPreload(async () => {
-    spriteSheet = createSprites(
-      "/images/sprites/fish-npc-assorted.gif",
-      (addSprite) => {
-        DIMENSIONS.forEach(({ height, width, x, y }) => {
-          addSprite(x, y, width, height);
-        });
-      }
-    );
-  });
+  initAnimatedNpcFishSpriteHelper();
 
   registerSetup(() => {
     ([1, 2, 3, 4, 5, 6, 7, 8] as Variant[]).forEach((variant) => {

@@ -1,7 +1,7 @@
 import { Layer, registerDraw, registerPreload } from "../drawing";
 import { canvas } from "../main";
 import { Sprite } from "../utils/drawing/Sprites";
-import { createFiniteAnimatedSpriteHelper } from "../utils/drawing/spritesheets/createFiniteAnimatedSpriteHelper";
+import { createAnimatedSpriteHelper } from "../utils/drawing/spritesheets/createAnimatedSpriteHelper";
 import { createSpritesFromGrid } from "../utils/drawing/spritesheets/createSpritesFromGrid";
 import { GridSpriteSheet } from "../utils/drawing/spritesheets/types";
 import { random } from "../utils/random";
@@ -55,7 +55,7 @@ export function addBubble({
     frames.push(spriteSheet.getSpriteInCell(columnIndex, rowIndex));
   }
 
-  const animationHelper = createFiniteAnimatedSpriteHelper({
+  const { getFrame } = createAnimatedSpriteHelper({
     frames,
     framesPerSecond: 2,
   });
@@ -70,7 +70,7 @@ export function addBubble({
     if (position.y <= 0) {
       unregister();
     } else {
-      const sprite = animationHelper.getFrame();
+      const sprite = getFrame();
       if (sprite) {
         canvas.drawSprite(sprite, position.x, position.y);
       } else {

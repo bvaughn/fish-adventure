@@ -103,6 +103,7 @@ export function initPlayer() {
 
     // Simulate breathing with random bubbles every now and then
     // TODO More bubbles when moving faster, less when standing still
+    // TODO Move this code into the createAnimatedFishSpriteHelper?
     if (data.frameNumber % 45 === 0) {
       const numBubbles = Math.round(random(2, 8));
       for (let i = 0; i < numBubbles; i++) {
