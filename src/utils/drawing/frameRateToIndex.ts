@@ -1,4 +1,5 @@
-import { api, frameRate } from "../p5";
+import { FRAME_RATE } from "../../constants";
+import { frameNumber } from "../../scheduler";
 
 export function frameRateToIndex({
   frameCount,
@@ -9,9 +10,9 @@ export function frameRateToIndex({
   framesPerSecond: number;
   prevFrameIndex: number;
 }) {
-  const mod = Math.floor(frameRate / framesPerSecond);
+  const mod = Math.floor(FRAME_RATE / framesPerSecond);
 
-  if (api.frameCount % mod === 0) {
+  if (frameNumber % mod === 0) {
     return (prevFrameIndex + 1) % frameCount;
   }
 

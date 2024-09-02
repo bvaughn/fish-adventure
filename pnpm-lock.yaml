@@ -17,16 +17,10 @@ importers:
       cubic-spline:
         specifier: ^3.0.3
         version: 3.0.3
-      p5:
-        specifier: ^1.10.0
-        version: 1.10.0
       raf:
         specifier: ^3.4.1
         version: 3.4.1
     devDependencies:
-      '@types/p5':
-        specifier: ^1.7.6
-        version: 1.7.6
       '@types/raf':
         specifier: ^3.4.3
         version: 3.4.3
@@ -409,9 +403,6 @@ packages:
   '@types/node@20.14.12':
     resolution: {integrity: sha512-r7wNXakLeSsGT0H1AU863vS2wa5wBOK4bWMjZz2wj+8nBx+m5PeIn0k8AloSLpRuiwdRQZwarZqHE4FNArPuJQ==}
 
-  '@types/p5@1.7.6':
-    resolution: {integrity: sha512-6pLTOo0V3N5jZb5nTwjiv3lPHLK3Z/TjbhQUj8CTWXocUk1Z/f6OHTp3Pcwi1BhWnf5gqKUcyEb1gP0KIJuQgw==}
-
   '@types/raf@3.4.3':
     resolution: {integrity: sha512-c4YAvMedbPZ5tEyxzQdMoOhhJ4RD3rngZIdwC2/qDN3d7JpEhB6fiBRKVY1lg5B7Wk+uPBjn5f39j1/2MY1oOw==}
 
@@ -650,9 +641,6 @@ packages:
   p-limit@5.0.0:
     resolution: {integrity: sha512-/Eaoq+QyLSiXQ4lyYV23f14mZRQcXnxfHrN0vCai+ak9G0pp9iEQukIIZq5NccEvwRB8PUnZT0KsOoDCINS1qQ==}
     engines: {node: '>=18'}
-
-  p5@1.10.0:
-    resolution: {integrity: sha512-6cWYBFhnZz7jNC6p1VWvlt3QReMqrRSmO90bgECQIKB9oko2w/sKrOAVMyei5tjIzSYcSY0JHy+BRtSAWq24jQ==}
 
   path-key@3.1.1:
     resolution: {integrity: sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q==}
@@ -1176,8 +1164,6 @@ snapshots:
       undici-types: 5.26.5
     optional: true
 
-  '@types/p5@1.7.6': {}
-
   '@types/raf@3.4.3': {}
 
   '@types/sinonjs__fake-timers@8.1.5': {}
@@ -1425,8 +1411,6 @@ snapshots:
   p-limit@5.0.0:
     dependencies:
       yocto-queue: 1.0.0
-
-  p5@1.10.0: {}
 
   path-key@3.1.1: {}
 

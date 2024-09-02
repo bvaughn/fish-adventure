@@ -9,6 +9,12 @@ export function arrowKeyWatcher(onChange: OnChange) {
   const leftRightKeyStack = new Array<LeftRight>();
   const upDownKeyStack = new Array<UpDown>();
 
+  function onBlur() {
+    leftRightKeyStack.splice(0);
+    upDownKeyStack.splice(0);
+    callOnChange();
+  }
+
   function onKeyDown(event: KeyboardEvent) {
     switch (event.key) {
       case "ArrowDown":
@@ -115,10 +121,12 @@ export function arrowKeyWatcher(onChange: OnChange) {
     return false;
   }
 
+  window.addEventListener("blur", onBlur);
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("keyup", onKeyUp);
 
   return function destroy() {
+    window.removeEventListener("blur", onBlur);
     window.removeEventListener("keydown", onKeyDown);
     window.removeEventListener("keyup", onKeyUp);
   };

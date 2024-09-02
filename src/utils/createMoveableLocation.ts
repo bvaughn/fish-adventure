@@ -1,35 +1,33 @@
-import * as P5 from "p5";
+import { timeSinceLastFrameMs } from "../scheduler";
+import { Velocity } from "../types";
 
 export type MoveableLocation = ReturnType<typeof createMoveableLocation>;
 
 export function createMoveableLocation({
-  api,
   friction = 0.15,
-  initialLocation = api.createVector(0, 0),
-  initialVelocity = api.createVector(0, 0),
+  initialLocation = { x: 0, y: 0 },
+  initialVelocity = { x: 0, y: 0 },
   maxLocation,
   maxVelocity = 1,
-  minLocation = api.createVector(0, 0),
+  minLocation = { x: 0, y: 0 },
   minVelocity = -1,
   scale = 1,
 }: {
-  api: P5;
   friction?: number;
-  initialLocation?: P5.Vector;
-  initialVelocity?: P5.Vector;
-  maxLocation?: P5.Vector;
+  initialLocation?: Velocity;
+  initialVelocity?: Velocity;
+  maxLocation?: Velocity;
   maxVelocity?: number;
-  minLocation?: P5.Vector;
+  minLocation?: Velocity;
   minVelocity?: number;
   scale?: number;
 }) {
-  const acceleration = api.createVector(0, 0);
+  const acceleration = { x: 0, y: 0 };
   const location = initialLocation;
   const velocity = initialVelocity;
 
   function update() {
-    const deltaTime = api.deltaTime;
-    const deltaTimeInSeconds = deltaTime / 1_000;
+    const deltaTimeInSeconds = timeSinceLastFrameMs / 1_000;
 
     if (acceleration.x !== 0) {
       velocity.x += acceleration.x * deltaTimeInSeconds;

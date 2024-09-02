@@ -8,10 +8,10 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch"
   },
   "devDependencies": {
-    "@types/p5": "^1.7.6",
     "@types/raf": "^3.4.3",
     "@types/sinonjs__fake-timers": "^8.1.5",
     "@vitejs/plugin-react": "^4.3.1",
@@ -23,7 +23,6 @@
     "@sinonjs/fake-timers": "^11.2.2",
     "approximately-equal": "^0.1.8",
     "cubic-spline": "^3.0.3",
-    "p5": "^1.10.0",
     "raf": "^3.4.1"
   }
 }
