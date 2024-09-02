@@ -27,6 +27,8 @@ const PIXELS_PER_SECOND = 1_250;
 
 let spriteSheet: SpriteSheet;
 
+// Add some random acceleration/deceleration to the NPCs
+
 export function addNPC(variant: Variant) {
   const data = DIMENSIONS[variant - 1];
   assert(data, `Invalid variant: ${variant}`);

@@ -90,7 +90,10 @@ export function initPlayer() {
 
     moveableLocation.update();
 
-    const sprite = animatedSpriteHelper.getSprite(direction);
+    const sprite = animatedSpriteHelper.getSprite(
+      direction,
+      moveableLocation.velocity.x !== 0
+    );
 
     canvas.drawSprite(
       sprite,

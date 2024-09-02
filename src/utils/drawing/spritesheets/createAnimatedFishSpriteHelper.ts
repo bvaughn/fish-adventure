@@ -23,8 +23,16 @@ export function createAnimatedFishSpriteHelper({
   source: string;
   size: Size;
 }) {
-  let backwardAnimatedSprite: AnimatedSpriteHelper;
-  let forwardAnimatedSprite: AnimatedSpriteHelper;
+  let animationHelpers: {
+    backward: {
+      moving: AnimatedSpriteHelper;
+      still: AnimatedSpriteHelper;
+    };
+    forward: {
+      moving: AnimatedSpriteHelper;
+      still: AnimatedSpriteHelper;
+    };
+  };
   let spriteSheet: GridSpriteSheet;
 
   registerPreload(async () => {
@@ -41,30 +49,51 @@ export function createAnimatedFishSpriteHelper({
       forwardFrames.push(spriteSheet.getSpriteInCell(columnIndex, 0));
     }
 
-    forwardAnimatedSprite = createAnimatedSpriteHelper({
-      frames: forwardFrames,
-      framesPerSecond: 2,
-    });
-
-    let backwardFrames: Sprite[] = [];
-    for (
-      let columnIndex = 0;
-      columnIndex < spriteSheet.columnCount;
-      columnIndex++
-    ) {
-      backwardFrames.push(spriteSheet.getSpriteInCell(columnIndex, 1));
-    }
-    backwardAnimatedSprite = createAnimatedSpriteHelper({
-      frames: backwardFrames,
-      framesPerSecond: 2,
-    });
+    animationHelpers = {
+      backward: {
+        moving: createAnimatedSpriteHelper({
+          frames: [
+            spriteSheet.getSpriteInCell(2, 1),
+            spriteSheet.getSpriteInCell(3, 1),
+          ],
+          framesPerSecond: 2,
+        }),
+        still: createAnimatedSpriteHelper({
+          frames: [
+            spriteSheet.getSpriteInCell(0, 1),
+            spriteSheet.getSpriteInCell(1, 1),
+          ],
+          framesPerSecond: 2,
+        }),
+      },
+      forward: {
+        moving: createAnimatedSpriteHelper({
+          frames: [
+            spriteSheet.getSpriteInCell(2, 0),
+            spriteSheet.getSpriteInCell(3, 0),
+          ],
+          framesPerSecond: 2,
+        }),
+        still: createAnimatedSpriteHelper({
+          frames: [
+            spriteSheet.getSpriteInCell(0, 0),
+            spriteSheet.getSpriteInCell(1, 0),
+          ],
+          framesPerSecond: 2,
+        }),
+      },
+    };
   });
 
   return {
-    getSprite(direction: "forward" | "backward") {
+    getSprite(direction: "forward" | "backward", isMoving: boolean) {
       return direction === "forward"
-        ? forwardAnimatedSprite.getFrame()
-        : backwardAnimatedSprite.getFrame();
+        ? isMoving
+          ? animationHelpers.forward.moving.getFrame()
+          : animationHelpers.forward.still.getFrame()
+        : isMoving
+          ? animationHelpers.backward.moving.getFrame()
+          : animationHelpers.backward.still.getFrame();
     },
     get size() {
       return size;
