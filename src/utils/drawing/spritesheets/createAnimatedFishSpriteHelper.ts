@@ -6,7 +6,7 @@ import {
   createAnimatedSpriteHelper,
 } from "./createAnimatedSpriteHelper";
 import { createSpritesFromGrid } from "./createSpritesFromGrid";
-import { SpriteSheet } from "./types";
+import { GridSpriteSheet } from "./types";
 
 export type AnimatedFishSpriteHelper = {
   getSprite(direction: "forward" | "backward"): Sprite;
@@ -25,7 +25,7 @@ export function createAnimatedFishSpriteHelper({
 }) {
   let backwardAnimatedSprite: AnimatedSpriteHelper;
   let forwardAnimatedSprite: AnimatedSpriteHelper;
-  let spriteSheet: SpriteSheet;
+  let spriteSheet: GridSpriteSheet;
 
   registerPreload(async () => {
     spriteSheet = createSpritesFromGrid(source, size);
@@ -38,7 +38,7 @@ export function createAnimatedFishSpriteHelper({
       columnIndex < spriteSheet.columnCount;
       columnIndex++
     ) {
-      forwardFrames.push(spriteSheet.getSprite(columnIndex, 0));
+      forwardFrames.push(spriteSheet.getSpriteInCell(columnIndex, 0));
     }
 
     forwardAnimatedSprite = createAnimatedSpriteHelper({
@@ -52,7 +52,7 @@ export function createAnimatedFishSpriteHelper({
       columnIndex < spriteSheet.columnCount;
       columnIndex++
     ) {
-      backwardFrames.push(spriteSheet.getSprite(columnIndex, 1));
+      backwardFrames.push(spriteSheet.getSpriteInCell(columnIndex, 1));
     }
     backwardAnimatedSprite = createAnimatedSpriteHelper({
       frames: backwardFrames,

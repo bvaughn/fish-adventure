@@ -5,7 +5,12 @@ export async function loadSprites(
   processFunction: (
     width: number,
     height: number,
-    addSprite: (x: number, y: number, width: number, height: number) => void
+    addSprite: (
+      x: number,
+      y: number,
+      width: number,
+      height: number
+    ) => Promise<Sprite>
   ) => void
 ): Promise<Sprite[]> {
   return new Promise<Sprite[]>((resolve, reject) => {
@@ -18,7 +23,9 @@ export async function loadSprites(
       const promises: Array<Promise<ImageBitmap>> = [];
 
       function addSprite(x: number, y: number, width: number, height: number) {
-        promises.push(createImageBitmap(image, x, y, width, height));
+        const promise = createImageBitmap(image, x, y, width, height);
+        promises.push(promise);
+        return promise;
       }
 
       processFunction(image.width, image.height, addSprite);

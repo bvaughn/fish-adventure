@@ -2,14 +2,12 @@ import { registerPreload } from "../../../drawing";
 import { Size } from "../../../types";
 import { assert } from "../../assert";
 import { loadSprites, Sprite } from "../Sprites";
-import { SpriteSheet } from "./types";
+import { FlatSpriteSheet } from "./types";
 
 export function createSpritesFromSizes(
   source: string,
   spriteWidths: number[]
-): SpriteSheet {
-  let columnCount = 0;
-  let rowCount = 0;
+): FlatSpriteSheet {
   let spriteSheetSize: Size = { width: 0, height: 0 };
   let sprites: Sprite[] = [];
 
@@ -29,26 +27,16 @@ export function createSpritesFromSizes(
   });
 
   return {
-    get columnCount() {
-      return columnCount;
-    },
-    get rowCount() {
-      return rowCount;
-    },
     get sprites() {
       return sprites;
     },
     get spriteSheetSize() {
       return spriteSheetSize;
     },
-    getSprite: (columnIndex: number, rowIndex: number) => {
-      const index = columnIndex + rowIndex * columnCount;
+    getSpriteAtIndex: (index) => {
       const sprite = sprites[index];
 
-      assert(
-        sprite != null,
-        `Sprite not found at column ${columnIndex} and row ${rowIndex}`
-      );
+      assert(sprite != null, `No sprite found at index ${index}`);
 
       return sprite;
     },

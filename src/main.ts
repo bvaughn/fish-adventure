@@ -2,7 +2,7 @@ import { runDraw, runPreload, runSetup } from "./drawing";
 import { initBackground } from "./game/background";
 import { initBubbles } from "./game/bubble";
 import { initForeground } from "./game/foreground";
-import { addNPC, initNPCs } from "./game/npcs";
+import { initNPCs } from "./game/npcs";
 import { initPlayer } from "./game/player";
 import {
   reset as resetScheduler,
@@ -12,12 +12,12 @@ import {
 import { createCanvas } from "./utils/drawing/Canvas";
 
 export const canvas = createCanvas({
-  height: 150,
+  height: Math.min(window.innerHeight, 200),
   parentElement: document.getElementById("root") as HTMLDivElement,
 });
 
 window.addEventListener("resize", () => {
-  canvas.resize(window.innerWidth, Math.min(window.innerHeight, 250));
+  canvas.resize(window.innerWidth, Math.min(window.innerHeight, 200));
 });
 
 async function run() {
@@ -28,12 +28,6 @@ async function run() {
   initBubbles();
   initPlayer();
   initForeground();
-
-  (["smallest", "small", "regular"] as const).forEach((size) => {
-    for (let index = 0; index < 3; index++) {
-      addNPC(size);
-    }
-  });
 
   // Preloading
   await runPreload();

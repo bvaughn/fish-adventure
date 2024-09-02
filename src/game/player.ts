@@ -22,10 +22,10 @@ const RATE_OF_ACCELERATION = 0.25;
 export function initPlayer() {
   const animatedSpriteHelper = createAnimatedFishSpriteHelper({
     size: {
-      width: 26,
+      width: 25,
       height: 13,
     },
-    source: "/images/sprites/fish-player-alt.gif",
+    source: "/images/sprites/fish-player.gif",
   });
   const maxLocation = { x: 0, y: 0 };
 

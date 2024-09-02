@@ -4,22 +4,24 @@ import {
   registerPreload,
   registerSetup,
 } from "../drawing";
-import { createSpritesFromGrid } from "../utils/drawing/spritesheets/createSpritesFromGrid";
-
-import { fromHex } from "../utils/drawing/Color";
-import { createSpritesFromSizes } from "../utils/drawing/spritesheets/createSpritesFromSizes";
-import { SpriteSheet } from "../utils/drawing/spritesheets/types";
 import { canvas } from "../main";
+import { fromHex } from "../utils/drawing/Color";
+import { createSpritesFromGrid } from "../utils/drawing/spritesheets/createSpritesFromGrid";
+import { createSpritesFromSizes } from "../utils/drawing/spritesheets/createSpritesFromSizes";
+import {
+  FlatSpriteSheet,
+  GridSpriteSheet,
+} from "../utils/drawing/spritesheets/types";
 
 const HILL_MIN_HEIGHT = 25;
 
 // TODO Scrollable map width (lazily generated?)
 
 export function initBackground() {
-  let featureSpriteSheet: SpriteSheet;
+  let featureSpriteSheet: FlatSpriteSheet;
   let featurePositions: number[];
   let hillSpriteIndices: number[];
-  let hillSpriteSheet: SpriteSheet;
+  let hillSpriteSheet: GridSpriteSheet;
 
   registerPreload(async () => {
     hillSpriteSheet = createSpritesFromGrid(

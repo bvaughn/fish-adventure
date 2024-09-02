@@ -11,7 +11,7 @@ import {
   createAnimatedSpriteHelper,
 } from "../utils/drawing/spritesheets/createAnimatedSpriteHelper";
 import { createSpritesFromGrid } from "../utils/drawing/spritesheets/createSpritesFromGrid";
-import { SpriteSheet } from "../utils/drawing/spritesheets/types";
+import { GridSpriteSheet } from "../utils/drawing/spritesheets/types";
 import { generateHillData } from "../utils/generateHillData";
 
 // TODO Scrollable map width (lazily generated?)
@@ -22,7 +22,7 @@ const TEXTURE_HEIGHT = 5;
 export function initForeground() {
   let animatedSprites: AnimatedSpriteHelper[];
   let spritePositions: number[] = [];
-  let spriteSheets: SpriteSheet[];
+  let spriteSheets: GridSpriteSheet[];
   let textureValues: number[] = [];
 
   registerPreload(async () => {
@@ -57,8 +57,8 @@ export function initForeground() {
         animatedSprites.push(
           createAnimatedSpriteHelper({
             frames: [
-              spriteSheet.getSprite(columnIndex, 0),
-              spriteSheet.getSprite(columnIndex, 1),
+              spriteSheet.getSpriteInCell(columnIndex, 0),
+              spriteSheet.getSpriteInCell(columnIndex, 1),
             ],
             framesPerSecond: 2,
           })

@@ -2,12 +2,12 @@ import { registerPreload } from "../../../drawing";
 import { Size } from "../../../types";
 import { assert } from "../../assert";
 import { loadSprites, Sprite } from "../Sprites";
-import { SpriteSheet } from "./types";
+import { GridSpriteSheet } from "./types";
 
 export function createSpritesFromGrid(
   source: string,
   spriteSize: Size
-): SpriteSheet {
+): GridSpriteSheet {
   let columnCount = 0;
   let rowCount = 0;
   let spriteSheetSize: Size = { width: 0, height: 0 };
@@ -42,7 +42,7 @@ export function createSpritesFromGrid(
     get spriteSheetSize() {
       return spriteSheetSize;
     },
-    getSprite: (columnIndex: number, rowIndex: number) => {
+    getSpriteInCell: (columnIndex: number, rowIndex: number) => {
       const index = columnIndex + rowIndex * columnCount;
       const sprite = sprites[index];
 

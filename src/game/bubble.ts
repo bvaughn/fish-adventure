@@ -3,12 +3,12 @@ import { canvas } from "../main";
 import { Sprite } from "../utils/drawing/Sprites";
 import { createFiniteAnimatedSpriteHelper } from "../utils/drawing/spritesheets/createFiniteAnimatedSpriteHelper";
 import { createSpritesFromGrid } from "../utils/drawing/spritesheets/createSpritesFromGrid";
-import { SpriteSheet } from "../utils/drawing/spritesheets/types";
+import { GridSpriteSheet } from "../utils/drawing/spritesheets/types";
 import { random } from "../utils/random";
 
 const PIXELS_PER_SECOND = 50;
 
-let spriteSheet: SpriteSheet;
+let spriteSheet: GridSpriteSheet;
 
 export function addBubble({
   layer,
@@ -52,7 +52,7 @@ export function addBubble({
     columnIndex < spriteSheet.columnCount;
     columnIndex++
   ) {
-    frames.push(spriteSheet.getSprite(columnIndex, rowIndex));
+    frames.push(spriteSheet.getSpriteInCell(columnIndex, rowIndex));
   }
 
   const animationHelper = createFiniteAnimatedSpriteHelper({

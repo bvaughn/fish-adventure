@@ -71,9 +71,9 @@ export function runDraw(canvas: Canvas, schedulerData: SchedulerData) {
   }
 }
 
-export async function runSetup() {
+export function runSetup() {
   for (const callback of callbacks.setup) {
-    await callback();
+    callback();
   }
 }
 
