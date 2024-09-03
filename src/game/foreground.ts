@@ -1,7 +1,7 @@
 import { PIXEL_SCALE } from "../constants";
 import {
-  FOREGROUND_LAYER,
-  PLAYER_LAYER_OVERLAY,
+  FOREGROUND_LAYER_1,
+  FOREGROUND_LAYER_2,
   registerDraw,
   registerPreload,
   registerSetup,
@@ -23,22 +23,25 @@ import { addBubble } from "./bubble";
 const TEXTURE_HEIGHT = 5;
 
 export function initForeground() {
-  let animatedSprites: AnimatedSpriteHelper[];
+  let animatedSpritesBig: AnimatedSpriteHelper[];
+  let animatedSpritesSmall: AnimatedSpriteHelper[];
   let spritePositions: number[] = [];
-  let spriteSheets: GridSpriteSheet[];
+  let spriteSheetBig: GridSpriteSheet;
+  let spriteSheetSmall: GridSpriteSheet;
   let textureValues: number[] = [];
 
   registerPreload(async () => {
-    spriteSheets = [
-      createSpritesFromGrid("/images/sprites/seaweed-big.gif", {
-        width: 16,
-        height: 31,
-      }),
-      createSpritesFromGrid("/images/sprites/seaweed-small.gif", {
+    spriteSheetBig = createSpritesFromGrid("/images/sprites/seaweed-big.gif", {
+      width: 16,
+      height: 31,
+    });
+    spriteSheetSmall = createSpritesFromGrid(
+      "/images/sprites/seaweed-small.gif",
+      {
         width: 13,
         height: 22,
-      }),
-    ];
+      }
+    );
   });
 
   registerSetup(() => {
@@ -49,33 +52,79 @@ export function initForeground() {
       width: window.outerWidth,
     });
 
-    animatedSprites = [];
+    animatedSpritesBig = [];
+    animatedSpritesSmall = [];
 
-    spriteSheets.forEach((spriteSheet) => {
-      for (
-        let columnIndex = 0;
-        columnIndex < spriteSheet.columnCount;
-        columnIndex++
-      ) {
-        animatedSprites.push(
-          createAnimatedSpriteHelper({
-            frames: [
-              spriteSheet.getSpriteInCell(columnIndex, 0),
-              spriteSheet.getSpriteInCell(columnIndex, 1),
-            ],
-            framesPerSecond: 2,
-          })
-        );
-        spritePositions.push(Math.random());
-      }
-    });
+    for (
+      let columnIndex = 0;
+      columnIndex < spriteSheetBig.columnCount;
+      columnIndex++
+    ) {
+      animatedSpritesBig.push(
+        createAnimatedSpriteHelper({
+          frames: [
+            spriteSheetBig.getSpriteInCell(columnIndex, 0),
+            spriteSheetBig.getSpriteInCell(columnIndex, 1),
+          ],
+          framesPerSecond: 2,
+        })
+      );
+      spritePositions.push(Math.random());
+    }
+
+    for (
+      let columnIndex = 0;
+      columnIndex < spriteSheetSmall.columnCount;
+      columnIndex++
+    ) {
+      animatedSpritesSmall.push(
+        createAnimatedSpriteHelper({
+          frames: [
+            spriteSheetSmall.getSpriteInCell(columnIndex, 0),
+            spriteSheetSmall.getSpriteInCell(columnIndex, 1),
+          ],
+          framesPerSecond: 2,
+        })
+      );
+      spritePositions.push(Math.random());
+    }
   });
+
+  registerDraw((data, canvas) => {
+    animatedSpritesSmall.forEach((animated, index) => {
+      const sprite = animated.getFrame();
+      const x = spritePositions[index] * canvas.width;
+      const y = canvas.height - sprite.height;
+
+      canvas.drawSprite(sprite, x, y);
+    });
+
+    // Simulate big bubbles coming up from random spots on the ocean floor
+    if (data.frameNumber % 100 === 0) {
+      const numBubbles = Math.round(random(2, 8));
+      const x = Math.round(random(0, canvas.width));
+      const y = canvas.height - random(0, 10);
+      for (let i = 0; i < numBubbles; i++) {
+        addBubble({
+          layer: FOREGROUND_LAYER_1,
+          partialPosition: {
+            x: x + random(-5, 5),
+            y: y + random(-5, 5),
+          },
+          partialVelocity: {
+            y: random(-0.5, -0.25),
+          },
+          size: "bigger",
+        });
+      }
+    }
+  }, FOREGROUND_LAYER_1);
 
   registerDraw((data, canvas) => {
     // Draw small foreground hills
     canvas.fill(fromHex("#000d13"));
 
-    animatedSprites.forEach((animated, index) => {
+    animatedSpritesBig.forEach((animated, index) => {
       const sprite = animated.getFrame();
       const x = spritePositions[index] * canvas.width;
       const y = canvas.height - sprite.height;
@@ -89,22 +138,5 @@ export function initForeground() {
 
       canvas.rect(x, y, PIXEL_SCALE, canvas.height - y);
     });
-
-    // Simulate big bubbles coming up from random spots on the ocean floor
-    if (data.frameNumber % 100 === 0) {
-      const numBubbles = Math.round(random(2, 8));
-      const x = Math.round(random(0, canvas.width));
-      const y = canvas.height - random(0, 10);
-      for (let i = 0; i < numBubbles; i++) {
-        addBubble({
-          layer: PLAYER_LAYER_OVERLAY,
-          partialPosition: { x: x + random(-5, 5), y: y + random(-5, 5) },
-          partialVelocity: {
-            y: random(-0.5, -0.25),
-          },
-          size: "bigger",
-        });
-      }
-    }
-  }, FOREGROUND_LAYER);
+  }, FOREGROUND_LAYER_2);
 }

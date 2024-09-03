@@ -6,14 +6,17 @@ type PreloadCallback = () => void | Promise<void>;
 type ResizeCallback = (canvas: Canvas) => void;
 type SetupCallback = () => void;
 
-export type Layer = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+export type Layer = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export const BACKGROUND_LAYER_1 = 0;
 export const BACKGROUND_LAYER_2 = 1;
 export const BACKGROUND_LAYER_3 = 2;
 export const PLAYER_LAYER_UNDERLAY = 3;
 export const PLAYER_LAYER = 4;
 export const PLAYER_LAYER_OVERLAY = 5;
-export const FOREGROUND_LAYER = 6;
+export const FOREGROUND_LAYER_1 = 6;
+export const FOREGROUND_LAYER_2 = 7;
+
+let currentLayerIndex: number | null = null;
 
 const callbacks = {
   draw: new Array<Array<DrawCallback>>([], [], [], [], [], [], []),
@@ -71,11 +74,18 @@ export async function runPreload() {
 
 export function runDraw(canvas: Canvas, schedulerData: SchedulerData) {
   // TODO Respect framerate
-  for (const drawCallbacks of callbacks.draw) {
+
+  for (let index = 0; index < callbacks.draw.length; index++) {
+    currentLayerIndex = index;
+
+    const drawCallbacks = callbacks.draw[index];
+
     for (const callback of drawCallbacks) {
       callback(schedulerData, canvas);
     }
   }
+
+  currentLayerIndex = null;
 }
 
 export function runSetup() {
