@@ -1,4 +1,10 @@
-import { runDraw, runPreload, runSetup, unregisterAll } from "./drawing";
+import {
+  runDraw,
+  runPreload,
+  runResize,
+  runSetup,
+  unregisterAll,
+} from "./drawing";
 import { initBackground } from "./game/background";
 import { initBubbles } from "./game/bubble";
 import { initForeground } from "./game/foreground";
@@ -6,12 +12,16 @@ import { initNPCs } from "./game/npcs";
 import { showTestHarness } from "./test";
 import { initPlayer } from "./game/player";
 import {
+  frameNumber,
   isRunning,
   pause,
   reset as resetScheduler,
   schedule,
   start,
   start as startScheduler,
+  timeSinceLastFrameMs,
+  timestamp,
+  timeTotalMs,
 } from "./scheduler";
 import { createCanvas } from "./utils/drawing/Canvas";
 
@@ -35,6 +45,15 @@ window.addEventListener("keydown", (event: KeyboardEvent) => {
 
 window.addEventListener("resize", () => {
   canvas.resize(window.innerWidth, Math.min(window.innerHeight, 200));
+
+  runResize(canvas);
+
+  runDraw(canvas, {
+    frameNumber,
+    timeSinceLastFrameMs,
+    timestamp,
+    timeTotalMs,
+  });
 });
 
 let stopGame: Function | null = null;
