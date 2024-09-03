@@ -1,5 +1,7 @@
 import {
+  BACKGROUND_LAYER_1,
   PLAYER_LAYER,
+  PLAYER_LAYER_UNDERLAY,
   registerDraw,
   registerPreload,
   registerSetup,
@@ -14,8 +16,15 @@ import {
   AnimatedFishSpriteHelper,
   createAnimatedFishSpriteHelper,
 } from "./utils/drawing/spritesheets/createAnimatedFishSpriteHelper";
-import { initAnimatedNpcFishSpriteHelper } from "./utils/drawing/spritesheets/createAnimatedNpcFishSpriteHelper";
-import { AnimatedSpriteHelper } from "./utils/drawing/spritesheets/createAnimatedSpriteHelper";
+import {
+  initAnimatedNpcFishSpriteHelper,
+  NPC_SPRITE_DIMENSIONS,
+  preloadNpcFishSprites,
+} from "./utils/drawing/spritesheets/createAnimatedNpcFishSpriteHelper";
+import {
+  AnimatedSpriteHelper,
+  createAnimatedSpriteHelper,
+} from "./utils/drawing/spritesheets/createAnimatedSpriteHelper";
 import { SpriteSheet } from "./utils/drawing/spritesheets/types";
 
 const PADDING = 10;
@@ -24,10 +33,13 @@ export function showTestHarness() {
   canvas.clear();
 
   {
+    let animationFrameHelpers: AnimatedSpriteHelper[];
     let npcSpriteSheet: SpriteSheet;
     let playerSpriteSheet: AnimatedFishSpriteHelper;
 
     registerPreload(async () => {
+      npcSpriteSheet = preloadNpcFishSprites();
+
       playerSpriteSheet = createAnimatedFishSpriteHelper({
         size: {
           width: 25,
@@ -40,50 +52,55 @@ export function showTestHarness() {
     });
 
     registerSetup(() => {
-      // ...
+      animationFrameHelpers = NPC_SPRITE_DIMENSIONS.map(
+        ({ x, y, width, frames }) =>
+          createAnimatedSpriteHelper({
+            frames: new Array(frames)
+              .fill(null as any)
+              .map((_, frameIndex) =>
+                npcSpriteSheet.getSpriteAtCoordinates(
+                  x + frameIndex * (width + 1),
+                  y
+                )
+              ),
+            framesPerSecond: 3,
+          })
+      );
     });
 
-    let animationFrameHelpers: AnimatedSpriteHelper[];
-
-    registerSetup(() => {
-      //   animationFrameHelpers = NPC_SPRITE_DIMENSIONS.map(
-      //     ({ x, y, width, frames }) =>
-      //       createAnimatedSpriteHelper({
-      //         frames: new Array(frames)
-      //           .fill(null)
-      //           .map((_, frameIndex) =>
-      //             npcSpriteSheet.getSpriteAtCoordinates(
-      //               x + frameIndex * (width + 1),
-      //               y
-      //             )
-      //           ),
-      //         framesPerSecond: 3,
-      //       })
-      //   );
-    });
+    let xPosition = 25;
+    let yPosition = 25;
 
     registerDraw((data, canvas) => {
       canvas.fill(fromHex("#008ca7"));
       canvas.rect(0, 0, canvas.width, canvas.height);
+    }, BACKGROUND_LAYER_1);
 
-      let xPosition = 25;
+    registerDraw((data, canvas) => {
+      xPosition = PADDING;
 
-      canvas.drawSprite(playerSpriteSheet.getSprite("forward", false), 25, 25);
+      canvas.drawSprite(
+        playerSpriteSheet.getSprite("forward", false),
+        xPosition,
+        yPosition
+      );
       canvas.drawSprite(
         playerSpriteSheet.getSprite("forward", true),
-        25,
-        25 + playerSpriteSheet.size.height + PADDING
+        PADDING,
+        yPosition + playerSpriteSheet.size.height + PADDING
       );
 
       xPosition += playerSpriteSheet.size.width + PADDING;
-
-      //   NPC_SPRITE_DIMENSIONS.forEach(({ x, y, width, frames }, index) => {
-      //     const sprite = animationFrameHelpers[index].getFrame();
-      //     canvas.drawSprite(sprite, xPosition, 25);
-
-      //     xPosition += width + PADDING;
-      //   });
     }, PLAYER_LAYER);
+
+    registerDraw((data, canvas) => {
+      animationFrameHelpers.forEach((animationHelper) => {
+        const sprite = animationHelper.getFrame();
+        canvas.drawSprite(sprite, xPosition, yPosition);
+
+        xPosition += sprite.width + PADDING;
+      });
+    }, PLAYER_LAYER_UNDERLAY);
   }
 
   initScheduler();

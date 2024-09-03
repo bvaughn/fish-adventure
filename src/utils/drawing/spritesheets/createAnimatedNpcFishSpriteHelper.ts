@@ -56,14 +56,18 @@ export function createAnimatedNpcFishSpriteHelper(variant: Variant) {
   };
 }
 
+export function preloadNpcFishSprites() {
+  return createSprites("/images/sprites/npc-fish.gif", (addSprite) => {
+    NPC_SPRITE_DIMENSIONS.forEach(({ height, width, x, y, frames }) => {
+      for (let frameIndex = 0; frameIndex < frames; frameIndex++) {
+        addSprite(x + frameIndex * (width + 1), y, width, height);
+      }
+    });
+  });
+}
+
 export function initAnimatedNpcFishSpriteHelper() {
   registerPreload(async () => {
-    spriteSheet = createSprites("/images/sprites/npc-fish.gif", (addSprite) => {
-      NPC_SPRITE_DIMENSIONS.forEach(({ height, width, x, y, frames }) => {
-        for (let frameIndex = 0; frameIndex < frames; frameIndex++) {
-          addSprite(x + frameIndex * (width + 1), y, width, height);
-        }
-      });
-    });
+    spriteSheet = preloadNpcFishSprites();
   });
 }

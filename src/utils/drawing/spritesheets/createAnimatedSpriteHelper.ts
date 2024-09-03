@@ -27,7 +27,7 @@ export function createAnimatedSpriteHelper({
     let frameIndex =
       elapsedMs >= thresholdMs ? prevFrameIndex + 1 : prevFrameIndex;
 
-    if (frameIndex >= frames.length) {
+    if (frameIndex >= frameCount) {
       if (loop) {
         frameIndex = 0;
       }
