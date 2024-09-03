@@ -99,6 +99,9 @@ export function initForeground() {
         addBubble({
           layer: PLAYER_LAYER_OVERLAY,
           partialPosition: { x: x + random(-5, 5), y: y + random(-5, 5) },
+          partialVelocity: {
+            y: random(-0.5, -0.25),
+          },
           size: "bigger",
         });
       }
