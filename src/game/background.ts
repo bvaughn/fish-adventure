@@ -20,6 +20,7 @@ const HILL_MIN_HEIGHT = 25;
 export function initBackground() {
   let featureSpriteSheet: FlatSpriteSheet;
   let featurePositions: number[];
+  let featureSpacing = 0;
   let hillSpriteIndices: number[];
   let hillSpriteSheet: GridSpriteSheet;
 
@@ -33,20 +34,23 @@ export function initBackground() {
     );
     featureSpriteSheet = createSpritesFromSizes(
       "/images/sprites/background-features.gif",
-      [14, 39, 45, 28, 49]
+      [14, 39, 45, 28, 49, 40, 36, 37]
     );
   });
 
   registerSetup(() => {
     hillSpriteIndices = [];
 
-    for (let x = 0; x < canvas.width; x += 320) {
+    for (let x = 0; x < canvas.width; x += hillSpriteSheet.spriteSize.width) {
       hillSpriteIndices.push(
-        Math.floor(Math.random() * hillSpriteSheet.columnCount)
+        Math.floor(Math.random() * hillSpriteSheet.sprites.length)
       );
     }
 
-    featurePositions = new Array(5).fill(true).map(() => Math.random());
+    featureSpacing = canvas.width / featureSpriteSheet.sprites.length;
+    featurePositions = new Array(featureSpriteSheet.sprites.length)
+      .fill(true)
+      .map(() => Math.random());
   });
 
   registerDraw((data, canvas) => {
@@ -70,7 +74,8 @@ export function initBackground() {
     });
 
     featureSpriteSheet.sprites.forEach((sprite, index) => {
-      const x = featurePositions[index] * canvas.width;
+      const x =
+        index * featureSpacing + featurePositions[index] * featureSpacing;
       const y = canvas.height - sprite.height;
 
       canvas.drawSprite(sprite, x, y);

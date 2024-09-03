@@ -39,6 +39,9 @@ export function createSpritesFromGrid(
     get sprites() {
       return sprites;
     },
+    get spriteSize() {
+      return spriteSize;
+    },
     get spriteSheetSize() {
       return spriteSheetSize;
     },

@@ -18,4 +18,5 @@ export type GridSpriteSheet = BaseSpriteSheet & {
   columnCount: number;
   getSpriteInCell: (columnIndex: number, rowIndex: number) => Sprite;
   rowCount: number;
+  spriteSize: Size;
 };

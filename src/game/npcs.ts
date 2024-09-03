@@ -17,9 +17,8 @@ import {
   initAnimatedNpcFishSpriteHelper,
 } from "../utils/drawing/spritesheets/createAnimatedNpcFishSpriteHelper";
 
+const POSITION_PADDING = 15;
 const PIXELS_PER_SECOND = 1_250;
-
-let spriteSheet: SpriteSheet;
 
 // TODO Animate NPC swimming
 
@@ -35,7 +34,10 @@ export function addNPC(variant: Variant) {
     friction: 0,
     initialLocation: {
       x: random(0, canvas.width),
-      y: random(0, canvas.height - helper.size.height),
+      y: random(
+        POSITION_PADDING,
+        canvas.height - helper.size.height - POSITION_PADDING
+      ),
     },
     initialVelocity: {
       x: random(-0.02, -0.07),
