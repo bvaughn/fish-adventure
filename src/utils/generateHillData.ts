@@ -32,22 +32,12 @@ export function generateHillData({
   for (let index = 0; index < maxIndex; index++) {
     let value = spline.at(index);
 
-    // let indexToUse = index;
     if (splineNoise !== 0) {
       if (Math.random() < splineNoise) {
-        //     const offset = Math.floor(Math.random() * splineNoise);
         const amount = Math.random() * (value * 0.05);
         const positive = Math.random() < 0.5;
 
         value = positive ? value + amount : value - amount;
-
-        //     indexToUse = Math.max(
-        //       0,
-        //       Math.min(
-        //         maxIndex - 1,
-        //         positive ? indexToUse + offset : indexToUse - offset
-        //       )
-        //     );
       }
     }
 

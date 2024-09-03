@@ -4,10 +4,6 @@ import { assert } from "../assert";
 import { Color, fromRgb } from "./Color";
 import { Sprite } from "./Sprites";
 
-// TODO
-// Should these drawing methods all enforce pixel boundaries?
-// e.g. round x/y coordinates and ceil width/height?
-
 type DrawingState = {
   fill: Color | null;
   stroke: Color | null;

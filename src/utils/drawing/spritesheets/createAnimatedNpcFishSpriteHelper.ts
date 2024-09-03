@@ -16,9 +16,9 @@ export type AnimatedFishSpriteHelper = {
 export type Variant = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 export const NPC_SPRITE_DIMENSIONS = [
-  { x: 1, y: 1, width: 22, height: 8, frames: 2 },
+  { x: 1, y: 1, width: 22, height: 9, frames: 2 },
   { x: 1, y: 11, width: 23, height: 24, frames: 2 },
-  { x: 1, y: 36, width: 26, height: 12, frames: 2 },
+  { x: 1, y: 37, width: 26, height: 12, frames: 2 },
   { x: 1, y: 51, width: 25, height: 20, frames: 2 },
   { x: 1, y: 73, width: 30, height: 12, frames: 2 },
   { x: 1, y: 87, width: 21, height: 17, frames: 2 },
