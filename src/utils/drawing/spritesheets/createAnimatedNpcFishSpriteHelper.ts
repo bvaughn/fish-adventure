@@ -36,7 +36,6 @@ export function createAnimatedNpcFishSpriteHelper(variant: Variant) {
   let animationHelper: AnimatedSpriteHelper;
 
   registerSetup(() => {
-    console.log("[npc] setup");
     animationHelper = createAnimatedSpriteHelper({
       frames: new Array(frames)
         .fill(null)
@@ -59,7 +58,6 @@ export function createAnimatedNpcFishSpriteHelper(variant: Variant) {
 
 export function initAnimatedNpcFishSpriteHelper() {
   registerPreload(async () => {
-    console.log("[npc] preload");
     spriteSheet = createSprites("/images/sprites/npc-fish.gif", (addSprite) => {
       NPC_SPRITE_DIMENSIONS.forEach(({ height, width, x, y, frames }) => {
         for (let frameIndex = 0; frameIndex < frames; frameIndex++) {

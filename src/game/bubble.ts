@@ -2,13 +2,66 @@ import { Layer, registerDraw, registerPreload } from "../drawing";
 import { canvas } from "../main";
 import { Sprite } from "../utils/drawing/Sprites";
 import { createAnimatedSpriteHelper } from "../utils/drawing/spritesheets/createAnimatedSpriteHelper";
+import { createSprites } from "../utils/drawing/spritesheets/createSprites";
 import { createSpritesFromGrid } from "../utils/drawing/spritesheets/createSpritesFromGrid";
-import { GridSpriteSheet } from "../utils/drawing/spritesheets/types";
+import {
+  GridSpriteSheet,
+  SpriteSheet,
+} from "../utils/drawing/spritesheets/types";
 import { random } from "../utils/random";
 
 const PIXELS_PER_SECOND = 50;
 
-let spriteSheet: GridSpriteSheet;
+const POSITIONS = [
+  {
+    x: 1,
+    y: 1,
+    size: 11,
+  },
+  {
+    x: 13,
+    y: 1,
+    size: 9,
+  },
+  {
+    x: 23,
+    y: 1,
+    size: 7,
+  },
+  {
+    x: 31,
+    y: 1,
+    size: 7,
+  },
+  {
+    x: 39,
+    y: 1,
+    size: 5,
+  },
+  {
+    x: 45,
+    y: 1,
+    size: 5,
+  },
+  {
+    x: 51,
+    y: 1,
+    size: 4,
+  },
+  {
+    x: 56,
+    y: 1,
+    size: 2,
+  },
+  {
+    x: 59,
+    y: 1,
+    size: 1,
+  },
+];
+
+let bigSpriteSheet: SpriteSheet;
+let smallSpriteSheet: GridSpriteSheet;
 
 export function addBubble({
   layer,
@@ -19,7 +72,7 @@ export function addBubble({
   layer: Layer;
   partialPosition?: { x?: number; y?: number };
   partialVelocity?: { x?: number; y?: number };
-  size: "regular" | "smaller" | "smallest";
+  size: "bigger" | "regular" | "smaller" | "smallest";
 }) {
   let minIndex = 0;
   switch (size) {
@@ -32,10 +85,14 @@ export function addBubble({
       break;
     }
   }
+
+  let spriteCount =
+    size === "bigger"
+      ? bigSpriteSheet.sprites.length
+      : smallSpriteSheet.columnCount;
+
   let rowIndex = Math.floor(Math.random() * 3);
-  let startColumnIndex: number = Math.floor(
-    random(minIndex, spriteSheet.columnCount)
-  );
+  let startColumnIndex: number = Math.floor(random(minIndex, spriteCount));
 
   let position = {
     x: partialPosition?.x ?? random(0, canvas.width),
@@ -49,15 +106,23 @@ export function addBubble({
   let frames: Sprite[] = [];
   for (
     let columnIndex = startColumnIndex;
-    columnIndex < spriteSheet.columnCount;
+    columnIndex < spriteCount;
     columnIndex++
   ) {
-    frames.push(spriteSheet.getSpriteInCell(columnIndex, rowIndex));
+    frames.push(
+      size === "bigger"
+        ? bigSpriteSheet.getSpriteAtCoordinates(
+            POSITIONS[columnIndex].x,
+            POSITIONS[columnIndex].y
+          )
+        : smallSpriteSheet.getSpriteInCell(columnIndex, rowIndex)
+    );
   }
 
   const { getFrame } = createAnimatedSpriteHelper({
     frames,
     framesPerSecond: 2,
+    loop: false,
   });
 
   const unregister = registerDraw((data, canvas) => {
@@ -82,9 +147,16 @@ export function addBubble({
 
 export function initBubbles() {
   registerPreload(() => {
-    spriteSheet = createSpritesFromGrid("/images/sprites/bubbles.gif", {
+    smallSpriteSheet = createSpritesFromGrid("/images/sprites/bubbles.gif", {
       width: 4,
       height: 4,
     });
+
+    bigSpriteSheet = createSprites(
+      "/images/sprites/big-bubbles.gif",
+      (addSprite) => {
+        POSITIONS.forEach(({ x, y, size }) => addSprite(x, y, size, size));
+      }
+    );
   });
 }

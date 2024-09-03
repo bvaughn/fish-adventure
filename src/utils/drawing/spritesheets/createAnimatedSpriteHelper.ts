@@ -9,9 +9,11 @@ export type AnimatedSpriteHelper = {
 export function createAnimatedSpriteHelper({
   frames,
   framesPerSecond = 1,
+  loop = true,
 }: {
   frames: Sprite[];
   framesPerSecond?: number;
+  loop?: boolean;
 }): AnimatedSpriteHelper {
   const frameCount = frames.length;
   const thresholdMs = Math.floor(1_000 / framesPerSecond);
@@ -22,10 +24,14 @@ export function createAnimatedSpriteHelper({
   function getFrameIndex() {
     const elapsedMs = timestamp - prevFrameUpdatedAtTime;
 
-    const frameIndex =
-      elapsedMs >= thresholdMs
-        ? (prevFrameIndex + 1) % frameCount
-        : prevFrameIndex % frameCount;
+    let frameIndex =
+      elapsedMs >= thresholdMs ? prevFrameIndex + 1 : prevFrameIndex;
+
+    if (frameIndex >= frames.length) {
+      if (loop) {
+        frameIndex = 0;
+      }
+    }
 
     if (prevFrameIndex !== frameIndex) {
       prevFrameIndex = frameIndex;
