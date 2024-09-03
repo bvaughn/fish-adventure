@@ -5,21 +5,19 @@ export type SchedulerData = {
   frameNumber: number;
   timeSinceLastFrameMs: number;
   timestamp: number;
-  timeTotalMs: number;
 };
 
-export type Callback = (data: SchedulerData) => void;
-export type CancelScheduled = () => void;
+export type ScheduledCallback = (data: SchedulerData) => void;
+export type CancelScheduledCallback = () => void;
 
 // Shared global state
 export let frameNumber = 0;
 export let timeSinceLastFrameMs: number = 0;
 export let timestamp: number = 0;
-export let timeTotalMs: number = 0;
 
 let animationFrameId: number | null = null;
 let lastAnimationFrameTime = performance.now();
-let scheduledCallbacks: Callback[] = [];
+let scheduledCallbacks: ScheduledCallback[] = [];
 let timeoutId: NodeJS.Timeout | null = null;
 
 export function isRunning() {
@@ -41,7 +39,15 @@ export function pause() {
 export function reset() {
   frameNumber = 0;
   lastAnimationFrameTime = performance.now();
-  timeTotalMs = 0;
+  timestamp = 0;
+}
+
+export function runScheduler_forTestingOnly(now: number) {
+  timeSinceLastFrameMs = now - lastAnimationFrameTime;
+
+  frameNumber++;
+  lastAnimationFrameTime = now;
+  timestamp += timeSinceLastFrameMs;
 }
 
 export function start() {
@@ -54,7 +60,7 @@ export function start() {
   animationFrameId = raf(onAnimationFrame);
 }
 
-export function schedule(callback: Callback) {
+export function schedule(callback: ScheduledCallback) {
   scheduledCallbacks.push(callback);
 
   return function unregister(): void {
@@ -72,19 +78,18 @@ function onAnimationFrame() {
 
   animationFrameId = null;
 
-  timestamp = performance.now();
-  timeSinceLastFrameMs = timestamp - lastAnimationFrameTime;
+  const now = performance.now();
+  timeSinceLastFrameMs = now - lastAnimationFrameTime;
 
   frameNumber++;
-  lastAnimationFrameTime = timestamp;
-  timeTotalMs += timeSinceLastFrameMs;
+  lastAnimationFrameTime = now;
+  timestamp += timeSinceLastFrameMs;
 
   scheduledCallbacks.forEach((callback) => {
     callback({
       frameNumber,
       timeSinceLastFrameMs,
       timestamp,
-      timeTotalMs,
     });
   });
 

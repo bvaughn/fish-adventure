@@ -1,72 +1,75 @@
-import {
-  BACKGROUND_LAYER_3,
-  registerDraw,
-  registerPreload,
-  registerSetup,
-} from "../drawing";
+import { BACKGROUND_LAYER_3, registerDraw, registerSetup } from "../drawing";
 import { canvas } from "../main";
-import { assert } from "../utils/assert";
-import { createMoveableLocation } from "../utils/createMoveableLocation";
-import { createSprites } from "../utils/drawing/spritesheets/createSprites";
-import { SpriteSheet } from "../utils/drawing/spritesheets/types";
-import { random } from "../utils/random";
-import { addBubble } from "./bubble";
+import { createMoveableVector } from "../utils/createMoveableVector";
+import { createNoise } from "../utils/createNoise";
 import {
   Variant,
   createAnimatedNpcFishSpriteHelper,
   initAnimatedNpcFishSpriteHelper,
 } from "../utils/drawing/spritesheets/createAnimatedNpcFishSpriteHelper";
+import { random } from "../utils/random";
+import { addBubble } from "./bubble";
 
 const POSITION_PADDING = 15;
-const PIXELS_PER_SECOND = 1_250;
-
-// TODO Animate NPC swimming
-
-// TODO Add some random acceleration/deceleration to the NPCs
+const PIXELS_PER_SECOND_Y = 50;
+const PIXELS_PER_SECOND_X = 100;
 
 export function addNPC(variant: Variant) {
   const helper = createAnimatedNpcFishSpriteHelper(variant);
 
+  const maxLocation = {
+    x: canvas.width,
+    y: canvas.height - helper.size.height,
+  };
   const minLocation = { x: 0 - helper.size.width, y: 0 };
   const rateOfBreathing = Math.round(random(0.5, 1.5) * 45);
 
-  const moveableLocation = createMoveableLocation({
-    friction: 0,
-    initialLocation: {
-      x: random(0, canvas.width),
-      y: random(
-        POSITION_PADDING,
-        canvas.height - helper.size.height - POSITION_PADDING
-      ),
-    },
-    initialVelocity: {
-      x: random(-0.02, -0.07),
-      y: 0,
-    },
-    minLocation,
-    scale: PIXELS_PER_SECOND,
-  });
+  let noise = createNoise();
+
+  const initMoveableVector = (reset = false) => {
+    return createMoveableVector({
+      friction: 0,
+      initialLocation: {
+        x: reset ? canvas.width : random(0, canvas.width),
+        y: random(
+          POSITION_PADDING,
+          canvas.height - helper.size.height - POSITION_PADDING
+        ),
+      },
+      initialVelocity: {
+        x: random(-0.5, -1) * PIXELS_PER_SECOND_X,
+        y: 0,
+      },
+      minVelocity: { x: -PIXELS_PER_SECOND_X, y: -PIXELS_PER_SECOND_Y },
+      maxVelocity: { x: -PIXELS_PER_SECOND_X / 2, y: PIXELS_PER_SECOND_Y },
+      minLocation,
+      maxLocation,
+    });
+  };
+
+  let moveableVector = initMoveableVector();
 
   registerDraw((data, canvas) => {
-    moveableLocation.update();
+    // Use perlin noise to add some speed and depth variation to the fish
+    const perlin = noise.getPerlin2d(moveableVector.getPosition().x * 0.005, 0);
+    if (perlin < 0.05) {
+      moveableVector.setAccelerationX(PIXELS_PER_SECOND_X);
+    } else if (perlin > 0.95) {
+      moveableVector.setAccelerationX(-PIXELS_PER_SECOND_X);
+    }
+    moveableVector.setVelocityY((perlin - 0.5) * 25);
 
     // Bounds check
-    if (moveableLocation.location.x === minLocation.x) {
-      moveableLocation.velocity.x = random(-0.04, -0.08);
-      moveableLocation.location.x = canvas.width;
-
-      moveableLocation.location.y = random(
-        0,
-        canvas.height - helper.size.height
-      );
+    if (moveableVector.getPosition().x === minLocation.x) {
+      noise = createNoise();
+      moveableVector = initMoveableVector(true);
     }
 
+    const position = moveableVector.getPosition();
+    const velocity = moveableVector.getVelocity();
+
     const sprite = helper.getSprite();
-    canvas.drawSprite(
-      sprite,
-      moveableLocation.location.x,
-      moveableLocation.location.y
-    );
+    canvas.drawSprite(sprite, position.x, position.y);
 
     // Simulate breathing with random bubbles every now and then
     // TODO More bubbles when moving faster, less when standing still
@@ -74,17 +77,17 @@ export function addNPC(variant: Variant) {
     if (data.frameNumber % rateOfBreathing === 0) {
       const numBubbles = Math.round(random(1, 4));
       for (let i = 0; i < numBubbles; i++) {
-        let x = moveableLocation.location.x;
+        let x = position.x;
         x += random(-2, 2);
 
-        let y = moveableLocation.location.y;
+        let y = position.y;
         y += random(-2, 2);
 
         addBubble({
           layer: BACKGROUND_LAYER_3,
           partialPosition: { x, y },
           partialVelocity: {
-            x: moveableLocation.velocity.x / 2,
+            x: velocity.x * 0.001,
           },
           size: "regular",
         });

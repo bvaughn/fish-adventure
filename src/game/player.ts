@@ -1,7 +1,7 @@
 import { PLAYER_LAYER, registerDraw, registerResize } from "../drawing";
 import { canvas } from "../main";
 import { arrowKeyWatcher } from "../utils/arrowKeyWatcher";
-import { createMoveableLocation } from "../utils/createMoveableLocation";
+import { createMoveableVector } from "../utils/createMoveableVector";
 import { createAnimatedFishSpriteHelper } from "../utils/drawing/spritesheets/createAnimatedFishSpriteHelper";
 import { random } from "../utils/random";
 import { addBubble } from "./bubble";
@@ -16,8 +16,9 @@ import { addBubble } from "./bubble";
 
 const SPRITE_HEIGHT = 13;
 const SPRITE_WIDTH = 26;
-const PIXELS_PER_SECOND = 2_000;
-const RATE_OF_ACCELERATION = 0.25;
+const FULL_VELOCITY = 250;
+const TIME_TO_STOP_FROM_FRICTION = 1_000;
+const TIME_TO_REACH_FULL_VELOCITY = 500;
 
 export function initPlayer() {
   const animatedSpriteHelper = createAnimatedFishSpriteHelper({
@@ -42,64 +43,63 @@ export function initPlayer() {
 
   updateMaxLocation();
 
-  const moveableLocation = createMoveableLocation({
+  const moveableLocation = createMoveableVector({
+    friction: (1_000 / TIME_TO_STOP_FROM_FRICTION) * FULL_VELOCITY,
     initialLocation: { x: 100, y: 100 },
     maxLocation,
-    scale: PIXELS_PER_SECOND,
+    minVelocity: { x: -FULL_VELOCITY, y: -FULL_VELOCITY },
+    maxVelocity: { x: FULL_VELOCITY, y: FULL_VELOCITY },
   });
 
   arrowKeyWatcher((leftRight, upDown) => {
+    const acceleration = (1_000 / TIME_TO_REACH_FULL_VELOCITY) * FULL_VELOCITY;
+
     switch (leftRight) {
       case "left": {
-        moveableLocation.acceleration.x = -RATE_OF_ACCELERATION;
+        moveableLocation.setAccelerationX(-acceleration);
         break;
       }
       case "right": {
-        moveableLocation.acceleration.x = RATE_OF_ACCELERATION;
+        moveableLocation.setAccelerationX(acceleration);
         break;
       }
       default: {
-        moveableLocation.acceleration.x = 0;
+        moveableLocation.setAccelerationX(0);
         break;
       }
     }
 
     switch (upDown) {
       case "down": {
-        moveableLocation.acceleration.y = RATE_OF_ACCELERATION;
+        moveableLocation.setAccelerationY(acceleration);
         break;
       }
       case "up": {
-        moveableLocation.acceleration.y = -RATE_OF_ACCELERATION;
+        moveableLocation.setAccelerationY(-acceleration);
         break;
       }
       default: {
-        moveableLocation.acceleration.y = 0;
+        moveableLocation.setAccelerationY(0);
         break;
       }
     }
   });
 
   registerDraw((data, canvas) => {
+    const acceleration = moveableLocation.getAcceleration();
+    const position = moveableLocation.getPosition();
+    const velocity = moveableLocation.getVelocity();
+
     // Cache direct so that the fish doesn't flip back when at rest
-    if (moveableLocation.acceleration.x < 0) {
+    if (acceleration.x < 0) {
       direction = "backward";
-    } else if (moveableLocation.acceleration.x > 0) {
+    } else if (acceleration.x > 0) {
       direction = "forward";
     }
 
-    moveableLocation.update();
+    const sprite = animatedSpriteHelper.getSprite(direction, velocity.x !== 0);
 
-    const sprite = animatedSpriteHelper.getSprite(
-      direction,
-      moveableLocation.velocity.x !== 0
-    );
-
-    canvas.drawSprite(
-      sprite,
-      moveableLocation.location.x,
-      moveableLocation.location.y
-    );
+    canvas.drawSprite(sprite, position.x, position.y);
 
     // Simulate breathing with random bubbles every now and then
     // TODO More bubbles when moving faster, less when standing still
@@ -107,20 +107,20 @@ export function initPlayer() {
     if (data.frameNumber % 45 === 0) {
       const numBubbles = Math.round(random(2, 8));
       for (let i = 0; i < numBubbles; i++) {
-        let x = moveableLocation.location.x;
+        let x = position.x;
         x += random(-2, 2);
         if (direction === "forward") {
           x += SPRITE_HEIGHT; // ???
         }
 
-        let y = moveableLocation.location.y;
+        let y = position.y;
         y += random(-2, 2);
 
         addBubble({
           layer: PLAYER_LAYER,
           partialPosition: { x, y },
           partialVelocity: {
-            x: moveableLocation.velocity.x / 2,
+            x: velocity.x * 0.001,
           },
           size: "regular",
         });

@@ -1,3 +1,5 @@
+import { timestamp } from "../scheduler";
+
 // Velocity and acceleration units should be percentages per second
 export function createMoveable({
   friction = 0,
@@ -17,7 +19,7 @@ export function createMoveable({
   minVelocity?: number;
 } = {}) {
   let acceleration = 0;
-  let lastTimestamp = 0;
+  let lastTimestamp = timestamp;
   let position = initialPosition;
   let velocity = initialVelocity;
 
@@ -39,17 +41,36 @@ export function createMoveable({
 
   function setAcceleration(value: number) {
     if (acceleration != 0) {
-      // Apply any pending acceleration before setting the new value
+      // Apply pending changes before setting the new value
       updateVelocity();
     }
 
-    lastTimestamp = performance.now();
-
+    lastTimestamp = timestamp;
     acceleration = value;
   }
 
+  function setPosition(value: number) {
+    if (acceleration != 0) {
+      // Apply pending changes before setting the new value
+      updateVelocity();
+    }
+
+    lastTimestamp = timestamp;
+    position = value;
+  }
+
+  function setVelocity(value: number) {
+    if (acceleration != 0) {
+      // Apply pending changes before setting the new value
+      updateVelocity();
+    }
+
+    lastTimestamp = timestamp;
+    velocity = value;
+  }
+
   function updateVelocity() {
-    const currentTimestamp = performance.now();
+    const currentTimestamp = timestamp;
     const elapsedTime = currentTimestamp - lastTimestamp;
 
     lastTimestamp = currentTimestamp;
@@ -112,5 +133,7 @@ export function createMoveable({
     getPosition,
     getVelocity,
     setAcceleration,
+    setPosition,
+    setVelocity,
   };
 }

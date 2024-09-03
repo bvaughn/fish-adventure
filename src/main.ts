@@ -21,7 +21,6 @@ import {
   start as startScheduler,
   timeSinceLastFrameMs,
   timestamp,
-  timeTotalMs,
 } from "./scheduler";
 import { createCanvas } from "./utils/drawing/Canvas";
 
@@ -52,7 +51,6 @@ window.addEventListener("resize", () => {
     frameNumber,
     timeSinceLastFrameMs,
     timestamp,
-    timeTotalMs,
   });
 });
 

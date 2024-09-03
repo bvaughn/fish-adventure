@@ -1,5 +1,6 @@
 import { install, InstalledClock } from "@sinonjs/fake-timers";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { reset, runScheduler_forTestingOnly, timestamp } from "../scheduler";
 import { createMoveable } from "./createMoveable";
 
 describe("createMoveable", () => {
@@ -7,11 +8,20 @@ describe("createMoveable", () => {
 
   beforeEach(() => {
     clock = install();
+
+    // Moveable is scheduler-based (so that it supports pause and resume)
+    reset();
   });
 
   afterEach(() => {
     clock.uninstall();
   });
+
+  function updateScheduler(elapsedTime: number) {
+    clock.tick(elapsedTime);
+
+    runScheduler_forTestingOnly(timestamp + elapsedTime);
+  }
 
   test("should accelerate to max velocity and position", () => {
     const velocity = createMoveable({
@@ -24,25 +34,25 @@ describe("createMoveable", () => {
     velocity.setAcceleration(0.5);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.00");
     expect(velocity.getPosition().toFixed(2)).toBe("0.00");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.25");
     expect(velocity.getPosition().toFixed(2)).toBe("0.13");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.50");
     expect(velocity.getPosition().toFixed(2)).toBe("0.38");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.75");
     expect(velocity.getPosition().toFixed(2)).toBe("0.75");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("1.00");
     expect(velocity.getPosition().toFixed(2)).toBe("1.25");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("1.00");
     expect(velocity.getPosition().toFixed(2)).toBe("1.75");
-    clock.tick(3_000);
+    updateScheduler(3_000);
     expect(velocity.getVelocity().toFixed(2)).toBe("1.00");
     expect(velocity.getPosition().toFixed(2)).toBe("4.75");
-    clock.tick(1_000);
+    updateScheduler(1_000);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.00");
     expect(velocity.getPosition().toFixed(2)).toBe("5.00");
   });
@@ -59,31 +69,31 @@ describe("createMoveable", () => {
     velocity.setAcceleration(-0.5);
     expect(velocity.getVelocity().toFixed(2)).toBe("1.00");
     expect(velocity.getPosition().toFixed(2)).toBe("0.00");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.75");
     expect(velocity.getPosition().toFixed(2)).toBe("0.38");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.50");
     expect(velocity.getPosition().toFixed(2)).toBe("0.63");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.25");
     expect(velocity.getPosition().toFixed(2)).toBe("0.75");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.00");
     expect(velocity.getPosition().toFixed(2)).toBe("0.75");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("-0.25");
     expect(velocity.getPosition().toFixed(2)).toBe("0.63");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("-0.50");
     expect(velocity.getPosition().toFixed(2)).toBe("0.38");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("-0.50");
     expect(velocity.getPosition().toFixed(2)).toBe("0.13");
-    clock.tick(3_000);
+    updateScheduler(3_000);
     expect(velocity.getVelocity().toFixed(2)).toBe("-0.50");
     expect(velocity.getPosition().toFixed(2)).toBe("-1.38");
-    clock.tick(3_000);
+    updateScheduler(3_000);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.00");
     expect(velocity.getPosition().toFixed(2)).toBe("-2.00");
   });
@@ -98,22 +108,22 @@ describe("createMoveable", () => {
 
     expect(velocity.getVelocity().toFixed(2)).toBe("1.00");
     expect(velocity.getPosition().toFixed(2)).toBe("0.00");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.95");
     expect(velocity.getPosition().toFixed(2)).toBe("0.47");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.90");
     expect(velocity.getPosition().toFixed(2)).toBe("0.92");
-    clock.tick(1_000);
+    updateScheduler(1_000);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.80");
     expect(velocity.getPosition().toFixed(2)).toBe("1.72");
-    clock.tick(7_000);
+    updateScheduler(7_000);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.10");
     expect(velocity.getPosition().toFixed(2)).toBe("2.42");
-    clock.tick(1_000);
+    updateScheduler(1_000);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.00");
     expect(velocity.getPosition().toFixed(2)).toBe("2.42");
-    clock.tick(5_000);
+    updateScheduler(5_000);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.00");
     expect(velocity.getPosition().toFixed(2)).toBe("2.42");
   });
@@ -128,22 +138,22 @@ describe("createMoveable", () => {
 
     expect(velocity.getVelocity().toFixed(2)).toBe("-1.00");
     expect(velocity.getPosition().toFixed(2)).toBe("0.00");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("-0.95");
     expect(velocity.getPosition().toFixed(2)).toBe("-0.47");
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("-0.90");
     expect(velocity.getPosition().toFixed(2)).toBe("-0.92");
-    clock.tick(1_000);
+    updateScheduler(1_000);
     expect(velocity.getVelocity().toFixed(2)).toBe("-0.80");
     expect(velocity.getPosition().toFixed(2)).toBe("-1.72");
-    clock.tick(7_000);
+    updateScheduler(7_000);
     expect(velocity.getVelocity().toFixed(2)).toBe("-0.10");
     expect(velocity.getPosition().toFixed(2)).toBe("-2.42");
-    clock.tick(1_000);
+    updateScheduler(1_000);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.00");
     expect(velocity.getPosition().toFixed(2)).toBe("-2.42");
-    clock.tick(5_000);
+    updateScheduler(5_000);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.00");
     expect(velocity.getPosition().toFixed(2)).toBe("-2.42");
   });
@@ -157,9 +167,9 @@ describe("createMoveable", () => {
     });
 
     velocity.setAcceleration(0.5);
-    clock.tick(500);
+    updateScheduler(500);
     velocity.setAcceleration(1);
-    clock.tick(500);
+    updateScheduler(500);
     expect(velocity.getVelocity().toFixed(2)).toBe("0.75");
     expect(velocity.getPosition().toFixed(2)).toBe("0.50");
   });
