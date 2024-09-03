@@ -1,4 +1,4 @@
-import { registerPreload } from "../../../drawing";
+import { schedulePreloadWork } from "../../../scheduling/initialization";
 import { Size } from "../../../types";
 import { assert } from "../../assert";
 import { loadSprites, Sprite } from "../Sprites";
@@ -16,7 +16,7 @@ export function createSprites(
 
   const getKey = (x: number, y: number) => `${x},${y}`;
 
-  registerPreload(async () => {
+  schedulePreloadWork(async () => {
     sprites = await loadSprites(source, (width, height, addSprite) => {
       spriteSheetSize.height = height;
       spriteSheetSize.width = width;

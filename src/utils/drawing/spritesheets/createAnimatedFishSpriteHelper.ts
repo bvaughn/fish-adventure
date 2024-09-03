@@ -1,4 +1,7 @@
-import { registerPreload, registerSetup } from "../../../drawing";
+import {
+  schedulePreloadWork,
+  scheduleSetupWork,
+} from "../../../scheduling/initialization";
 import { Size } from "../../../types";
 import { Sprite } from "../Sprites";
 import {
@@ -34,11 +37,11 @@ export function createAnimatedFishSpriteHelper({
   };
   let spriteSheet: GridSpriteSheet;
 
-  registerPreload(async () => {
+  schedulePreloadWork(async () => {
     spriteSheet = createSpritesFromGrid(source, size);
   });
 
-  registerSetup(() => {
+  scheduleSetupWork(() => {
     let forwardFrames: Sprite[] = [];
     for (
       let columnIndex = 0;

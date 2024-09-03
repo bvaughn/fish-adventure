@@ -6,3 +6,5 @@ export const COLORS = {
 };
 export const FRAME_RATE = 30;
 export const PIXEL_SCALE = 2;
+
+export const LAYER_PARALLAX = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];

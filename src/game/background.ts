@@ -1,10 +1,12 @@
+import { canvas } from "../main";
 import {
   BACKGROUND_LAYER_1,
-  registerDraw,
-  registerPreload,
-  registerSetup,
-} from "../drawing";
-import { canvas } from "../main";
+  registerRenderFunction,
+} from "../scheduling/drawing";
+import {
+  schedulePreloadWork,
+  scheduleSetupWork,
+} from "../scheduling/initialization";
 import { fromHex } from "../utils/drawing/Color";
 import { createSpritesFromGrid } from "../utils/drawing/spritesheets/createSpritesFromGrid";
 import { createSpritesFromSizes } from "../utils/drawing/spritesheets/createSpritesFromSizes";
@@ -24,7 +26,7 @@ export function initBackground() {
   let hillSpriteIndices: number[];
   let hillSpriteSheet: GridSpriteSheet;
 
-  registerPreload(async () => {
+  schedulePreloadWork(async () => {
     hillSpriteSheet = createSpritesFromGrid(
       "/images/sprites/background-hills.gif",
       {
@@ -38,7 +40,7 @@ export function initBackground() {
     );
   });
 
-  registerSetup(() => {
+  scheduleSetupWork(() => {
     hillSpriteIndices = [];
 
     for (let x = 0; x < canvas.width; x += hillSpriteSheet.spriteSize.width) {
@@ -53,7 +55,7 @@ export function initBackground() {
       .map(() => Math.random());
   });
 
-  registerDraw((data, canvas) => {
+  registerRenderFunction((data, canvas) => {
     canvas.fill(fromHex("#008ca7"));
     canvas.rect(0, 0, canvas.width, canvas.height);
 

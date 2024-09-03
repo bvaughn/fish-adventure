@@ -1,10 +1,15 @@
-import { PLAYER_LAYER, registerDraw, registerResize } from "../drawing";
+import {
+  PLAYER_LAYER,
+  registerRenderFunction,
+  handleResize,
+} from "../scheduling/drawing";
 import { canvas } from "../main";
 import { arrowKeyWatcher } from "../utils/arrowKeyWatcher";
 import { createMoveableVector } from "../utils/createMoveableVector";
 import { createAnimatedFishSpriteHelper } from "../utils/drawing/spritesheets/createAnimatedFishSpriteHelper";
 import { random } from "../utils/random";
 import { addBubble } from "./bubble";
+import { setPlayerPosition } from "./sharedState";
 
 // TODO Add more ways to control the fish;
 // Right now we support arrow keys and WASD
@@ -32,7 +37,7 @@ export function initPlayer() {
 
   let direction: "forward" | "backward" = "forward";
 
-  registerResize(() => {
+  handleResize(() => {
     updateMaxLocation();
   });
 
@@ -85,10 +90,12 @@ export function initPlayer() {
     }
   });
 
-  registerDraw((data, canvas) => {
+  registerRenderFunction((data, canvas) => {
     const acceleration = moveableLocation.getAcceleration();
     const position = moveableLocation.getPosition();
     const velocity = moveableLocation.getVelocity();
+
+    setPlayerPosition(position);
 
     // Cache direct so that the fish doesn't flip back when at rest
     if (acceleration.x < 0) {

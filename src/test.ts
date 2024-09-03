@@ -1,16 +1,18 @@
+import { canvas } from "./main";
 import {
   BACKGROUND_LAYER_1,
+  callRenderFunctions,
   PLAYER_LAYER,
   PLAYER_LAYER_UNDERLAY,
-  registerDraw,
-  registerPreload,
-  registerSetup,
-  runDraw,
-  runPreload,
-  runSetup,
-} from "./drawing";
-import { canvas } from "./main";
-import { reset, schedule, start } from "./scheduler";
+  registerRenderFunction,
+} from "./scheduling/drawing";
+import {
+  runPreloadWork,
+  runSetupWork,
+  schedulePreloadWork,
+  scheduleSetupWork,
+} from "./scheduling/initialization";
+import { reset, schedule, start } from "./scheduling/scheduler";
 import { fromHex } from "./utils/drawing/Color";
 import {
   AnimatedFishSpriteHelper,
@@ -36,7 +38,7 @@ export function showTestHarness() {
     let npcSpriteSheet: SpriteSheet;
     let playerSpriteSheet: AnimatedFishSpriteHelper;
 
-    registerPreload(async () => {
+    schedulePreloadWork(async () => {
       npcSpriteSheet = preloadNpcFishSprites();
 
       playerSpriteSheet = createAnimatedFishSpriteHelper({
@@ -50,7 +52,7 @@ export function showTestHarness() {
       initAnimatedNpcFishSpriteHelper();
     });
 
-    registerSetup(() => {
+    scheduleSetupWork(() => {
       animationFrameHelpers = NPC_SPRITE_DIMENSIONS.map((_, index) =>
         setupNpcFishSprites((index + 1) as Variant)
       );
@@ -59,12 +61,12 @@ export function showTestHarness() {
     let xPosition = 25;
     let yPosition = 25;
 
-    registerDraw((data, canvas) => {
+    registerRenderFunction((data, canvas) => {
       canvas.fill(fromHex("#008ca7"));
       canvas.rect(0, 0, canvas.width, canvas.height);
     }, BACKGROUND_LAYER_1);
 
-    registerDraw((data, canvas) => {
+    registerRenderFunction((data, canvas) => {
       xPosition = PADDING;
 
       canvas.drawSprite(
@@ -81,7 +83,7 @@ export function showTestHarness() {
       xPosition += playerSpriteSheet.size.width + PADDING;
     }, PLAYER_LAYER);
 
-    registerDraw((data, canvas) => {
+    registerRenderFunction((data, canvas) => {
       animationFrameHelpers.forEach((animationHelper) => {
         const sprite = animationHelper.getFrame();
         canvas.drawSprite(sprite, xPosition, yPosition);
@@ -95,10 +97,10 @@ export function showTestHarness() {
 }
 
 async function initScheduler() {
-  await runPreload();
-  runSetup();
+  await runPreloadWork();
+  runSetupWork();
   schedule((data) => {
-    runDraw(canvas, data);
+    callRenderFunctions(canvas, data);
   });
   reset();
   start();

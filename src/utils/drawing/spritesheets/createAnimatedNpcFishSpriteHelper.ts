@@ -1,4 +1,7 @@
-import { registerPreload, registerSetup } from "../../../drawing";
+import {
+  schedulePreloadWork,
+  scheduleSetupWork,
+} from "../../../scheduling/initialization";
 import { Size } from "../../../types";
 import { Sprite } from "../Sprites";
 import {
@@ -45,11 +48,11 @@ export function createAnimatedNpcFishSpriteHelper(variant: Variant) {
 }
 
 export function initAnimatedNpcFishSpriteHelper() {
-  registerPreload(() => {
+  schedulePreloadWork(() => {
     preloadNpcFishSprites();
   });
 
-  registerSetup(() => {
+  scheduleSetupWork(() => {
     animationHelpers = NPC_SPRITE_DIMENSIONS.map((_, index) =>
       setupNpcFishSprites((index + 1) as Variant)
     );

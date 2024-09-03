@@ -1,5 +1,6 @@
-import { Layer, registerDraw, registerPreload } from "../drawing";
 import { canvas } from "../main";
+import { Layer, registerRenderFunction } from "../scheduling/drawing";
+import { schedulePreloadWork } from "../scheduling/initialization";
 import { Sprite } from "../utils/drawing/Sprites";
 import { createAnimatedSpriteHelper } from "../utils/drawing/spritesheets/createAnimatedSpriteHelper";
 import { createSpritesFromGrid } from "../utils/drawing/spritesheets/createSpritesFromGrid";
@@ -65,7 +66,7 @@ export function addBubble({
     loop: false,
   });
 
-  const unregister = registerDraw((data, canvas) => {
+  const unregister = registerRenderFunction((data, canvas) => {
     // TODO Wobble left to right
     const deltaTimeInSeconds = data.timeSinceLastFrameMs / 1_000;
 
@@ -86,7 +87,7 @@ export function addBubble({
 }
 
 export function initBubbles() {
-  registerPreload(() => {
+  schedulePreloadWork(() => {
     bigSpriteSheet = createSpritesFromGrid("/images/sprites/big-bubbles.gif", {
       width: 13,
       height: 13,

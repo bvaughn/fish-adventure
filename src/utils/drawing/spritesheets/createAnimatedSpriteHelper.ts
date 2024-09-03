@@ -1,4 +1,4 @@
-import { timestamp } from "../../../scheduler";
+import { timestamp } from "../../../scheduling/scheduler";
 import { Sprite } from "../Sprites";
 
 export type AnimatedSpriteHelper = {

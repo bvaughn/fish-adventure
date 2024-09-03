@@ -1,16 +1,10 @@
-import {
-  runDraw,
-  runPreload,
-  runResize,
-  runSetup,
-  unregisterAll,
-} from "./drawing";
 import { initBackground } from "./game/background";
 import { initBubbles } from "./game/bubble";
 import { initForeground } from "./game/foreground";
 import { initNPCs } from "./game/npcs";
-import { showTestHarness } from "./test";
 import { initPlayer } from "./game/player";
+import { callRenderFunctions, callResizeHanlders } from "./scheduling/drawing";
+import { runPreloadWork, runSetupWork } from "./scheduling/initialization";
 import {
   frameNumber,
   isRunning,
@@ -21,7 +15,8 @@ import {
   start as startScheduler,
   timeSinceLastFrameMs,
   timestamp,
-} from "./scheduler";
+} from "./scheduling/scheduler";
+import { showTestHarness } from "./test";
 import { createCanvas } from "./utils/drawing/Canvas";
 
 export const canvas = createCanvas({
@@ -45,9 +40,9 @@ window.addEventListener("keydown", (event: KeyboardEvent) => {
 window.addEventListener("resize", () => {
   canvas.resize(window.innerWidth, Math.min(window.innerHeight, 200));
 
-  runResize(canvas);
+  callResizeHanlders(canvas);
 
-  runDraw(canvas, {
+  callRenderFunctions(canvas, {
     frameNumber,
     timeSinceLastFrameMs,
     timestamp,
@@ -66,14 +61,14 @@ async function run() {
   initForeground();
 
   // Preloading
-  await runPreload();
+  await runPreloadWork();
 
   // Setup
-  runSetup();
+  runSetupWork();
 
   // Start draw loop
   stopGame = schedule((data) => {
-    runDraw(canvas, data);
+    callRenderFunctions(canvas, data);
   });
   resetScheduler();
   startScheduler();

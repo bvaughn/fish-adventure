@@ -1,5 +1,9 @@
-import { BACKGROUND_LAYER_3, registerDraw, registerSetup } from "../drawing";
 import { canvas } from "../main";
+import {
+  BACKGROUND_LAYER_3,
+  registerRenderFunction,
+} from "../scheduling/drawing";
+import { scheduleSetupWork } from "../scheduling/initialization";
 import { createMoveableVector } from "../utils/createMoveableVector";
 import { createNoise } from "../utils/createNoise";
 import {
@@ -49,7 +53,7 @@ export function addNPC(variant: Variant) {
 
   let moveableVector = initMoveableVector();
 
-  registerDraw((data, canvas) => {
+  registerRenderFunction((data, canvas) => {
     // Use perlin noise to add some speed and depth variation to the fish
     const perlin = noise.getPerlin2d(moveableVector.getPosition().x * 0.005, 0);
     if (perlin < 0.05) {
@@ -99,7 +103,7 @@ export function addNPC(variant: Variant) {
 export function initNPCs() {
   initAnimatedNpcFishSpriteHelper();
 
-  registerSetup(() => {
+  scheduleSetupWork(() => {
     ([1, 2, 3, 4, 5, 6, 7, 8] as Variant[]).forEach((variant) => {
       addNPC(variant);
     });

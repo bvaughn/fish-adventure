@@ -1,5 +1,5 @@
 import raf from "raf";
-import { FRAME_RATE } from "./constants";
+import { FRAME_RATE } from "../constants";
 
 export type SchedulerData = {
   frameNumber: number;
@@ -10,7 +10,8 @@ export type SchedulerData = {
 export type ScheduledCallback = (data: SchedulerData) => void;
 export type CancelScheduledCallback = () => void;
 
-// Shared global state
+// Shared global state used for rendering and game behavior
+// All code should use these values (and never call performance.now() directly) to ensure pause/resume works correctly
 export let frameNumber = 0;
 export let timeSinceLastFrameMs: number = 0;
 export let timestamp: number = 0;
@@ -42,6 +43,7 @@ export function reset() {
   timestamp = 0;
 }
 
+// Ties animation code together with @sinonjs/fake-timers
 export function runScheduler_forTestingOnly(now: number) {
   timeSinceLastFrameMs = now - lastAnimationFrameTime;
 

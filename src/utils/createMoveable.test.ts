@@ -1,6 +1,10 @@
 import { install, InstalledClock } from "@sinonjs/fake-timers";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { reset, runScheduler_forTestingOnly, timestamp } from "../scheduler";
+import {
+  reset,
+  runScheduler_forTestingOnly,
+  timestamp,
+} from "../scheduling/scheduler";
 import { createMoveable } from "./createMoveable";
 
 describe("createMoveable", () => {

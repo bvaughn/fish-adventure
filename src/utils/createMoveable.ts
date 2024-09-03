@@ -1,4 +1,4 @@
-import { timestamp } from "../scheduler";
+import { timestamp } from "../scheduling/scheduler";
 
 // Velocity and acceleration units should be percentages per second
 export function createMoveable({

@@ -2,10 +2,12 @@ import { PIXEL_SCALE } from "../constants";
 import {
   FOREGROUND_LAYER_1,
   FOREGROUND_LAYER_2,
-  registerDraw,
-  registerPreload,
-  registerSetup,
-} from "../drawing";
+  registerRenderFunction,
+} from "../scheduling/drawing";
+import {
+  schedulePreloadWork,
+  scheduleSetupWork,
+} from "../scheduling/initialization";
 import { fromHex } from "../utils/drawing/Color";
 import {
   AnimatedSpriteHelper,
@@ -30,7 +32,7 @@ export function initForeground() {
   let spriteSheetSmall: GridSpriteSheet;
   let textureValues: number[] = [];
 
-  registerPreload(async () => {
+  schedulePreloadWork(async () => {
     spriteSheetBig = createSpritesFromGrid("/images/sprites/seaweed-big.gif", {
       width: 16,
       height: 31,
@@ -44,7 +46,7 @@ export function initForeground() {
     );
   });
 
-  registerSetup(() => {
+  scheduleSetupWork(() => {
     textureValues = generateHillData({
       hillSectionPixelSize: 5,
       splineNoise: 5,
@@ -90,7 +92,7 @@ export function initForeground() {
     }
   });
 
-  registerDraw((data, canvas) => {
+  registerRenderFunction((data, canvas) => {
     animatedSpritesSmall.forEach((animated, index) => {
       const sprite = animated.getFrame();
       const x = spritePositions[index] * canvas.width;
@@ -120,7 +122,7 @@ export function initForeground() {
     }
   }, FOREGROUND_LAYER_1);
 
-  registerDraw((data, canvas) => {
+  registerRenderFunction((data, canvas) => {
     // Draw small foreground hills
     canvas.fill(fromHex("#000d13"));
 
