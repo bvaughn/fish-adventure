@@ -14,7 +14,6 @@ export type AnimatedFishSpriteHelper = {
 };
 
 // TODO Add turning-around frame(s)
-// TODO Move bubbles logic into this helper?
 
 export function createAnimatedFishSpriteHelper({
   source,

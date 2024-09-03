@@ -20,11 +20,10 @@ import {
   initAnimatedNpcFishSpriteHelper,
   NPC_SPRITE_DIMENSIONS,
   preloadNpcFishSprites,
+  setupNpcFishSprites,
+  Variant,
 } from "./utils/drawing/spritesheets/createAnimatedNpcFishSpriteHelper";
-import {
-  AnimatedSpriteHelper,
-  createAnimatedSpriteHelper,
-} from "./utils/drawing/spritesheets/createAnimatedSpriteHelper";
+import { AnimatedSpriteHelper } from "./utils/drawing/spritesheets/createAnimatedSpriteHelper";
 import { SpriteSheet } from "./utils/drawing/spritesheets/types";
 
 const PADDING = 10;
@@ -52,19 +51,8 @@ export function showTestHarness() {
     });
 
     registerSetup(() => {
-      animationFrameHelpers = NPC_SPRITE_DIMENSIONS.map(
-        ({ x, y, width, frames }) =>
-          createAnimatedSpriteHelper({
-            frames: new Array(frames)
-              .fill(null as any)
-              .map((_, frameIndex) =>
-                npcSpriteSheet.getSpriteAtCoordinates(
-                  x + frameIndex * (width + 1),
-                  y
-                )
-              ),
-            framesPerSecond: 3,
-          })
+      animationFrameHelpers = NPC_SPRITE_DIMENSIONS.map((_, index) =>
+        setupNpcFishSprites((index + 1) as Variant)
       );
     });
 

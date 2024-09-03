@@ -26,25 +26,13 @@ export const NPC_SPRITE_DIMENSIONS = [
   { x: 1, y: 124, width: 26, height: 18, frames: 2 },
 ];
 
+let animationHelpers: AnimatedSpriteHelper[] = [];
 let spriteSheet: SpriteSheet;
 
-// TODO Move bubbles logic into a helper?
-
 export function createAnimatedNpcFishSpriteHelper(variant: Variant) {
-  const { width, height, x, y, frames } = NPC_SPRITE_DIMENSIONS[variant - 1];
+  const { width, height } = NPC_SPRITE_DIMENSIONS[variant - 1];
 
-  let animationHelper: AnimatedSpriteHelper;
-
-  registerSetup(() => {
-    animationHelper = createAnimatedSpriteHelper({
-      frames: new Array(frames)
-        .fill(null)
-        .map((_, frameIndex) =>
-          spriteSheet.getSpriteAtCoordinates(x + frameIndex * (width + 1), y)
-        ),
-      framesPerSecond: 3,
-    });
-  });
+  const animationHelper = animationHelpers[variant - 1];
 
   return {
     getSprite() {
@@ -56,18 +44,39 @@ export function createAnimatedNpcFishSpriteHelper(variant: Variant) {
   };
 }
 
+export function initAnimatedNpcFishSpriteHelper() {
+  registerPreload(() => {
+    preloadNpcFishSprites();
+  });
+
+  registerSetup(() => {
+    animationHelpers = NPC_SPRITE_DIMENSIONS.map((_, index) =>
+      setupNpcFishSprites((index + 1) as Variant)
+    );
+  });
+}
+
 export function preloadNpcFishSprites() {
-  return createSprites("/images/sprites/npc-fish.gif", (addSprite) => {
+  spriteSheet = createSprites("/images/sprites/npc-fish.gif", (addSprite) => {
     NPC_SPRITE_DIMENSIONS.forEach(({ height, width, x, y, frames }) => {
       for (let frameIndex = 0; frameIndex < frames; frameIndex++) {
         addSprite(x + frameIndex * (width + 1), y, width, height);
       }
     });
   });
+
+  return spriteSheet;
 }
 
-export function initAnimatedNpcFishSpriteHelper() {
-  registerPreload(async () => {
-    spriteSheet = preloadNpcFishSprites();
+export function setupNpcFishSprites(variant: Variant) {
+  const { width, x, y, frames } = NPC_SPRITE_DIMENSIONS[variant - 1];
+
+  return createAnimatedSpriteHelper({
+    frames: new Array(frames)
+      .fill(null)
+      .map((_, frameIndex) =>
+        spriteSheet.getSpriteAtCoordinates(x + frameIndex * (width + 1), y)
+      ),
+    framesPerSecond: 3,
   });
 }
