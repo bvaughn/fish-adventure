@@ -1,8 +1,11 @@
 import { DEBUG_POSITIONS } from "../constants";
 import { canvas } from "../main";
-import { NPC_LAYER, scheduleRenderWork } from "../scheduling/drawing";
-import { scheduleNPCPreRenderUpdate } from "../scheduling/gameLogic";
 import { scheduleSetupWork } from "../scheduling/initialization";
+import {
+  NPC_LAYER,
+  scheduleNPCPreRenderUpdate,
+  scheduleRenderWork,
+} from "../scheduling/rendering";
 import { Vector } from "../types";
 import { createMoveableVector } from "../utils/createMoveableVector";
 import { createNoise } from "../utils/createNoise";
@@ -26,9 +29,10 @@ let variantsOnScreen: Map<Variant, number> = new Map();
 
 export function addNPC(variant: Variant, respawn = false) {
   if (variantsOnScreen.has(variant)) {
-    console.debug(
-      `Cannot render ${variant} NPC; already on screen with id ${variantsOnScreen.get(variant)}`
-    );
+    // TODO
+    // console.debug(
+    //   `Cannot render ${variant} NPC; already on screen with id ${variantsOnScreen.get(variant)}`
+    // );
     return;
   }
 

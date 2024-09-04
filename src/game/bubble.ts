@@ -1,5 +1,5 @@
 import { canvas } from "../main";
-import { Layer, scheduleRenderWork } from "../scheduling/drawing";
+import { Layer, scheduleRenderWork } from "../scheduling/rendering";
 import { schedulePreloadWork } from "../scheduling/initialization";
 import { Sprite } from "../utils/drawing/Sprites";
 import { createAnimatedSpriteHelper } from "../utils/drawing/spritesheets/createAnimatedSpriteHelper";

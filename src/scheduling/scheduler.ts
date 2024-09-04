@@ -21,6 +21,14 @@ let lastAnimationFrameTime = performance.now();
 let scheduledCallbacks: ScheduledCallback[] = [];
 let timeoutId: NodeJS.Timeout | null = null;
 
+export function getSchedulerData(): SchedulerData {
+  return {
+    frameNumber,
+    timeSinceLastFrameMs,
+    timestamp,
+  };
+}
+
 export function isRunning() {
   return animationFrameId !== null || timeoutId !== null;
 }

@@ -1,21 +1,18 @@
+import { initializeSharedState } from "./game/sharedState";
 import { canvas } from "./main";
-import {
-  BACKGROUND_LAYER_1,
-  callRenderFunctions,
-  PLAYER_LAYER,
-  PLAYER_LAYER_UNDERLAY,
-  scheduleRenderWork,
-} from "./scheduling/drawing";
-import {
-  runNPCPreRenderCallbacks,
-  runPlayerPreRenderCallbacks,
-} from "./scheduling/gameLogic";
 import {
   runPreloadWork,
   runSetupWork,
   schedulePreloadWork,
   scheduleSetupWork,
 } from "./scheduling/initialization";
+import {
+  BACKGROUND_LAYER_1,
+  PLAYER_LAYER,
+  PLAYER_LAYER_UNDERLAY,
+  runRenderPipeline,
+  scheduleRenderWork,
+} from "./scheduling/rendering";
 import { reset, schedule, start } from "./scheduling/scheduler";
 import { fromHex } from "./utils/drawing/Color";
 import {
@@ -35,6 +32,8 @@ import { SpriteSheet } from "./utils/drawing/spritesheets/types";
 const PADDING = 10;
 
 export function showTestHarness() {
+  initializeSharedState();
+
   canvas.clear();
 
   {
@@ -103,10 +102,8 @@ export function showTestHarness() {
 async function initScheduler() {
   await runPreloadWork();
   runSetupWork();
-  schedule((data) => {
-    runNPCPreRenderCallbacks(data);
-    runPlayerPreRenderCallbacks(data);
-    callRenderFunctions(canvas, data);
+  schedule(() => {
+    runRenderPipeline(canvas);
   });
   reset();
   start();

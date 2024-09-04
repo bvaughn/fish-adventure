@@ -3,9 +3,9 @@ import { canvas } from "../main";
 import {
   handleResize,
   PLAYER_LAYER,
+  schedulePlayerPreRenderUpdate,
   scheduleRenderWork,
-} from "../scheduling/drawing";
-import { schedulePlayerPreRenderUpdate } from "../scheduling/gameLogic";
+} from "../scheduling/rendering";
 import { Vector } from "../types";
 import { arrowKeyWatcher } from "../utils/arrowKeyWatcher";
 import { createMoveableVector } from "../utils/createMoveableVector";

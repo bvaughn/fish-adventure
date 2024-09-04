@@ -3,25 +3,19 @@ import { initBubbles } from "./game/bubble";
 import { initForeground } from "./game/foreground";
 import { initNPCs } from "./game/npcs";
 import { initPlayer } from "./game/player";
-import { callRenderFunctions, callResizeHandlers } from "./scheduling/drawing";
-import {
-  runNPCPreRenderCallbacks,
-  runPlayerPreRenderCallbacks,
-} from "./scheduling/gameLogic";
+import { callResizeHandlers, runRenderPipeline } from "./scheduling/rendering";
 import { runPreloadWork, runSetupWork } from "./scheduling/initialization";
 import {
-  frameNumber,
   isRunning,
   pause,
   reset as resetScheduler,
   schedule,
   start,
   start as startScheduler,
-  timeSinceLastFrameMs,
-  timestamp,
 } from "./scheduling/scheduler";
 import { showTestHarness } from "./test";
 import { createCanvas } from "./utils/drawing/Canvas";
+import { initializeSharedState } from "./game/sharedState";
 
 export const canvas = createCanvas({
   height: Math.min(window.innerHeight, 200),
@@ -47,21 +41,14 @@ window.addEventListener("resize", () => {
   canvas.resize(window.innerWidth, Math.min(window.innerHeight, 200));
 
   callResizeHandlers(canvas);
-
-  const data = {
-    frameNumber,
-    timeSinceLastFrameMs,
-    timestamp,
-  };
-
-  runNPCPreRenderCallbacks(data);
-  runPlayerPreRenderCallbacks(data);
-  callRenderFunctions(canvas, data);
+  runRenderPipeline(canvas);
 });
 
 let stopGame: Function | null = null;
 
 async function run() {
+  initializeSharedState();
+
   // Module initialization
   // Note that order is important because it can impact drawing order (aka z-index)
   initBackground();
@@ -77,10 +64,8 @@ async function run() {
   runSetupWork();
 
   // Start draw loop
-  stopGame = schedule((data) => {
-    runNPCPreRenderCallbacks(data);
-    runPlayerPreRenderCallbacks(data);
-    callRenderFunctions(canvas, data);
+  stopGame = schedule(() => {
+    runRenderPipeline(canvas);
   });
   resetScheduler();
   startScheduler();

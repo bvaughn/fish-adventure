@@ -1,8 +1,9 @@
 import { Canvas } from "../utils/drawing/Canvas";
-import { SchedulerData } from "./scheduler";
+import { getSchedulerData, SchedulerData } from "./scheduler";
 
-type DrawCallback = (schedulerData: SchedulerData, canvas: Canvas) => void;
+type RenderCallback = (schedulerData: SchedulerData, canvas: Canvas) => void;
 type ResizeCallback = (canvas: Canvas) => void;
+type PreRenderCallback = (schedulerData: SchedulerData) => void;
 
 export type Layer = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
@@ -29,8 +30,13 @@ const LAYERS: Layer[] = [
 let currentLayer: Layer | null = null;
 
 const callbacks = {
-  render: new Array(LAYERS.length).fill(true).map(() => []) as DrawCallback[][],
+  npc: [] as Array<PreRenderCallback>,
+  player: [] as Array<PreRenderCallback>,
+  render: new Array(LAYERS.length)
+    .fill(true)
+    .map(() => []) as RenderCallback[][],
   resize: [] as Array<ResizeCallback>,
+  scene: [] as Array<PreRenderCallback>,
 };
 
 export function handleResize(callback: ResizeCallback) {
@@ -39,15 +45,6 @@ export function handleResize(callback: ResizeCallback) {
 
 export function getCurrentLayer(): Layer | null {
   return currentLayer;
-}
-
-export function scheduleRenderWork(callback: DrawCallback, layer: Layer) {
-  let layerCallbacks = callbacks.render[layer];
-  if (layerCallbacks == null) {
-    layerCallbacks = callbacks.render[layer] = [];
-  }
-
-  return registerCallbackHelper(callback, layerCallbacks);
 }
 
 function registerCallbackHelper(callback: Function, callbacks: Function[]) {
@@ -61,16 +58,43 @@ function registerCallbackHelper(callback: Function, callbacks: Function[]) {
   };
 }
 
-export function unregisterAll() {
-  callbacks.render = new Array(LAYERS.length).fill(true).map(() => []);
-  callbacks.resize = [];
+export function scheduleNPCPreRenderUpdate(callback: PreRenderCallback) {
+  return registerCallbackHelper(callback, callbacks.npc);
 }
 
-export function callRenderFunctions(
-  canvas: Canvas,
-  schedulerData: SchedulerData
-) {
+export function schedulePlayerPreRenderUpdate(callback: PreRenderCallback) {
+  return registerCallbackHelper(callback, callbacks.player);
+}
+
+export function scheduleSceneSetupPreRenderUpdate(callback: PreRenderCallback) {
+  return registerCallbackHelper(callback, callbacks.scene);
+}
+
+export function scheduleRenderWork(callback: RenderCallback, layer: Layer) {
+  let layerCallbacks = callbacks.render[layer];
+  if (layerCallbacks == null) {
+    layerCallbacks = callbacks.render[layer] = [];
+  }
+
+  return registerCallbackHelper(callback, layerCallbacks);
+}
+
+export function unregisterAll() {
+  callbacks.npc = [];
+  callbacks.player = [];
+  callbacks.render = new Array(LAYERS.length).fill(true).map(() => []);
+  callbacks.resize = [];
+  callbacks.scene = [];
+}
+
+export function runRenderPipeline(canvas: Canvas) {
   canvas.clear();
+
+  const schedulerData = getSchedulerData();
+
+  callbacks.scene.forEach((callback) => callback(schedulerData));
+  callbacks.npc.forEach((callback) => callback(schedulerData));
+  callbacks.player.forEach((callback) => callback(schedulerData));
 
   LAYERS.forEach((layer, index) => {
     currentLayer = layer;
