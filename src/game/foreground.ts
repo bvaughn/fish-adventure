@@ -1,65 +1,80 @@
-import { PIXEL_SCALE, TILE_SIZE } from "../constants";
+import { TILE_SIZE } from "../constants";
 import { schedulePreloadWork } from "../scheduling/initialization";
 import { FOREGROUND_LAYER, scheduleRenderWork } from "../scheduling/rendering";
-import { fromHex } from "../utils/drawing/Color";
 import {
   AnimatedSpriteHelper,
   createAnimatedSpriteHelper,
 } from "../utils/drawing/spritesheets/createAnimatedSpriteHelper";
 import { createSpritesFromGrid } from "../utils/drawing/spritesheets/createSpritesFromGrid";
 import { GridSpriteSheet } from "../utils/drawing/spritesheets/types";
-import { generateHillData } from "../utils/generateHillData";
 import { getVisibleTilesForLayer } from "./sharedState";
 
 type Tile = {
-  animatedSpritesBig: AnimatedSpriteHelper[];
-  spritePositionsBig: number[];
-  textureValues: number[];
+  animatedSeaweedSprites: AnimatedSpriteHelper[];
+  seaweedPositions: number[];
+  textureIndices: number[];
 };
 
 const SEAWEED_PER_250_PX = 2;
-const TEXTURE_HEIGHT = 5;
 
 export function initForeground() {
-  let spriteSheetBig: GridSpriteSheet;
+  let seaweedSpriteSheet: GridSpriteSheet;
+  let textureSpriteSheet: GridSpriteSheet;
   let tiles: Tile[] = [];
 
   schedulePreloadWork(async () => {
-    spriteSheetBig = createSpritesFromGrid("/images/sprites/seaweed-big.gif", {
-      width: 16,
-      height: 31,
-    });
+    seaweedSpriteSheet = createSpritesFromGrid(
+      "/images/sprites/seaweed-big.gif",
+      {
+        width: 16,
+        height: 31,
+      }
+    );
+    textureSpriteSheet = createSpritesFromGrid(
+      "/images/sprites/foreground-texture.gif",
+      {
+        width: 100,
+        height: 6,
+      }
+    );
   });
 
   function getTile(index: number): Tile {
     while (index > tiles.length - 1) {
-      const animatedSpritesBig: AnimatedSpriteHelper[] = [];
-      const spritePositionsBig: number[] = [];
+      const animatedSeaweedSprites: AnimatedSpriteHelper[] = [];
+      const seaweedPositions: number[] = [];
+      const textureIndices: number[] = [];
 
-      // TODO This doesn't work so well; the edges end up being jagged
-      // Maybe I should just hand-draw these assets too; wouldn't take long
-      const textureValues = generateHillData({
-        hillSectionPixelSize: 5,
-        splineNoise: 5,
-        width: TILE_SIZE,
-      });
-
-      const countToRender = Math.ceil(TILE_SIZE / 250) * SEAWEED_PER_250_PX;
-
-      for (let x = 0; x < countToRender; x++) {
-        animatedSpritesBig.push(
+      const seaweedToRender = Math.ceil(TILE_SIZE / 250) * SEAWEED_PER_250_PX;
+      for (let x = 0; x < seaweedToRender; x++) {
+        animatedSeaweedSprites.push(
           createAnimatedSpriteHelper({
             frames: [
-              spriteSheetBig.getSpriteInCell(x % spriteSheetBig.columnCount, 0),
-              spriteSheetBig.getSpriteInCell(x % spriteSheetBig.columnCount, 1),
+              seaweedSpriteSheet.getSpriteInCell(
+                x % seaweedSpriteSheet.columnCount,
+                0
+              ),
+              seaweedSpriteSheet.getSpriteInCell(
+                x % seaweedSpriteSheet.columnCount,
+                1
+              ),
             ],
             framesPerSecond: 2,
           })
         );
-        spritePositionsBig.push(Math.random());
+        seaweedPositions.push(Math.random());
       }
 
-      tiles.push({ animatedSpritesBig, spritePositionsBig, textureValues });
+      const texturesToRender = Math.ceil(
+        TILE_SIZE / textureSpriteSheet.spriteSize.width
+      );
+      for (let x = 0; x < texturesToRender; x++) {
+        textureIndices.push(
+          Math.floor(Math.random() * textureSpriteSheet.columnCount)
+        );
+      }
+
+      tiles.push({ animatedSeaweedSprites, seaweedPositions, textureIndices });
     }
 
     return tiles[index];
@@ -68,27 +83,28 @@ export function initForeground() {
   scheduleRenderWork((data, canvas) => {
     const visibleTiles = getVisibleTilesForLayer(FOREGROUND_LAYER);
     visibleTiles.rects.forEach((rect, index) => {
-      const { animatedSpritesBig, spritePositionsBig, textureValues } =
+      const { animatedSeaweedSprites, seaweedPositions, textureIndices } =
         getTile(index);
 
-      for (let index = 0; index < spritePositionsBig.length; index++) {
-        const animated = animatedSpritesBig[index % animatedSpritesBig.length];
+      for (let index = 0; index < seaweedPositions.length; index++) {
+        const animated =
+          animatedSeaweedSprites[index % animatedSeaweedSprites.length];
         const sprite = animated.getFrame();
 
-        const position = spritePositionsBig[index];
+        const position = seaweedPositions[index];
         const x = rect.x + position * rect.width;
         const y = canvas.height - sprite.height;
 
         canvas.drawSprite(sprite, x, y);
       }
 
-      canvas.fill(fromHex("#000d13"));
+      textureIndices.forEach((textureIndex, index) => {
+        const sprite = textureSpriteSheet.getSpriteInCell(textureIndex, 0);
 
-      textureValues.forEach((value, index) => {
-        const x = rect.x + index * PIXEL_SCALE;
-        const y = canvas.height - value * TEXTURE_HEIGHT * PIXEL_SCALE;
+        const x = rect.x + index * sprite.width;
+        const y = canvas.height - sprite.height;
 
-        canvas.rect(x, y, PIXEL_SCALE, canvas.height - y);
+        canvas.drawSprite(sprite, x, y);
       });
     });
   }, FOREGROUND_LAYER);
