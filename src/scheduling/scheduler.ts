@@ -74,10 +74,6 @@ export function schedule(callback: ScheduledCallback) {
 }
 
 function onAnimationFrame() {
-  if (animationFrameId == null) {
-    return;
-  }
-
   animationFrameId = null;
 
   const now = performance.now();

@@ -13,10 +13,14 @@ import { SpriteSheet } from "./types";
 
 export type AnimatedFishSpriteHelper = {
   getSprite(): Sprite;
+  getSpriteIndex(): number;
   size: Size;
 };
 
 export type Variant = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+export const VARIANTS = new Array(8)
+  .fill(null)
+  .map((_, index) => index + 1) as Variant[];
 
 export const NPC_SPRITE_DIMENSIONS = [
   { x: 1, y: 1, width: 22, height: 9, frames: 2 },
@@ -40,6 +44,9 @@ export function createAnimatedNpcFishSpriteHelper(variant: Variant) {
   return {
     getSprite() {
       return animationHelper.getFrame();
+    },
+    getSpriteIndex() {
+      return animationHelper.getFrameIndex();
     },
     get size() {
       return { height, width };

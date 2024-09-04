@@ -1,20 +1,19 @@
-import {
-  PLAYER_LAYER,
-  registerRenderFunction,
-  handleResize,
-} from "../scheduling/drawing";
+import { DEBUG_POSITIONS, MAX_OFFSET_X } from "../constants";
 import { canvas } from "../main";
+import {
+  handleResize,
+  PLAYER_LAYER,
+  scheduleRenderWork,
+} from "../scheduling/drawing";
+import { schedulePlayerPreRenderUpdate } from "../scheduling/gameLogic";
+import { Vector } from "../types";
 import { arrowKeyWatcher } from "../utils/arrowKeyWatcher";
 import { createMoveableVector } from "../utils/createMoveableVector";
+import { fromHex } from "../utils/drawing/Color";
 import { createAnimatedFishSpriteHelper } from "../utils/drawing/spritesheets/createAnimatedFishSpriteHelper";
 import { random } from "../utils/random";
 import { addBubble } from "./bubble";
-import { setPlayerPosition } from "./sharedState";
-
-// TODO Add more ways to control the fish;
-// Right now we support arrow keys and WASD
-// Ideally we would also support click/touch to move to a location
-// It's not clear how these two modes would interact/interfere with each other though!
+import { updatePlayerPosition } from "./sharedState";
 
 // TODO Share more code with initNpcFish
 // Swimming, breathing, etc are all too similar to have this much duplication
@@ -24,6 +23,10 @@ const SPRITE_WIDTH = 26;
 const FULL_VELOCITY = 250;
 const TIME_TO_STOP_FROM_FRICTION = 1_000;
 const TIME_TO_REACH_FULL_VELOCITY = 500;
+
+// TODO Move motion/location processing out of drawing methods
+// Player and NPC positions and velocity should be updated before drawing
+// So that everything draws in-sync regardless of layering order
 
 export function initPlayer() {
   const animatedSpriteHelper = createAnimatedFishSpriteHelper({
@@ -42,7 +45,7 @@ export function initPlayer() {
   });
 
   const updateMaxLocation = () => {
-    maxLocation.x = canvas.width - SPRITE_WIDTH;
+    maxLocation.x = MAX_OFFSET_X - SPRITE_WIDTH;
     maxLocation.y = canvas.height - SPRITE_HEIGHT;
   };
 
@@ -90,12 +93,14 @@ export function initPlayer() {
     }
   });
 
-  registerRenderFunction((data, canvas) => {
-    const acceleration = moveableLocation.getAcceleration();
-    const position = moveableLocation.getPosition();
-    const velocity = moveableLocation.getVelocity();
+  let acceleration: Vector;
+  let position: Vector;
+  let velocity: Vector;
 
-    setPlayerPosition(position);
+  schedulePlayerPreRenderUpdate(() => {
+    acceleration = moveableLocation.getAcceleration();
+    position = moveableLocation.getPosition();
+    velocity = moveableLocation.getVelocity();
 
     // Cache direct so that the fish doesn't flip back when at rest
     if (acceleration.x < 0) {
@@ -104,9 +109,28 @@ export function initPlayer() {
       direction = "forward";
     }
 
+    updatePlayerPosition(
+      { width: SPRITE_WIDTH, height: SPRITE_HEIGHT },
+      position,
+      velocity
+    );
+  });
+
+  scheduleRenderWork((data, canvas) => {
     const sprite = animatedSpriteHelper.getSprite(direction, velocity.x !== 0);
 
     canvas.drawSprite(sprite, position.x, position.y);
+
+    if (DEBUG_POSITIONS) {
+      canvas.font("6px sans-serif");
+      canvas.fill(fromHex("#ffffff"));
+      canvas.stroke(fromHex("#000000"));
+      canvas.drawText(
+        position.x + sprite.width / 2,
+        position.y + sprite.height + 5,
+        `${Math.round(position.x)}, ${Math.round(position.y)}`
+      );
+    }
 
     // Simulate breathing with random bubbles every now and then
     // TODO More bubbles when moving faster, less when standing still

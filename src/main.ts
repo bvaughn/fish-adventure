@@ -3,7 +3,11 @@ import { initBubbles } from "./game/bubble";
 import { initForeground } from "./game/foreground";
 import { initNPCs } from "./game/npcs";
 import { initPlayer } from "./game/player";
-import { callRenderFunctions, callResizeHanlders } from "./scheduling/drawing";
+import { callRenderFunctions, callResizeHandlers } from "./scheduling/drawing";
+import {
+  runNPCPreRenderCallbacks,
+  runPlayerPreRenderCallbacks,
+} from "./scheduling/gameLogic";
 import { runPreloadWork, runSetupWork } from "./scheduling/initialization";
 import {
   frameNumber,
@@ -24,6 +28,8 @@ export const canvas = createCanvas({
   parentElement: document.getElementById("root") as HTMLDivElement,
 });
 
+callResizeHandlers(canvas);
+
 window.addEventListener("keydown", (event: KeyboardEvent) => {
   switch (event.key) {
     case "Enter": {
@@ -40,13 +46,17 @@ window.addEventListener("keydown", (event: KeyboardEvent) => {
 window.addEventListener("resize", () => {
   canvas.resize(window.innerWidth, Math.min(window.innerHeight, 200));
 
-  callResizeHanlders(canvas);
+  callResizeHandlers(canvas);
 
-  callRenderFunctions(canvas, {
+  const data = {
     frameNumber,
     timeSinceLastFrameMs,
     timestamp,
-  });
+  };
+
+  runNPCPreRenderCallbacks(data);
+  runPlayerPreRenderCallbacks(data);
+  callRenderFunctions(canvas, data);
 });
 
 let stopGame: Function | null = null;
@@ -68,6 +78,8 @@ async function run() {
 
   // Start draw loop
   stopGame = schedule((data) => {
+    runNPCPreRenderCallbacks(data);
+    runPlayerPreRenderCallbacks(data);
     callRenderFunctions(canvas, data);
   });
   resetScheduler();

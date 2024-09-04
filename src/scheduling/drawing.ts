@@ -5,19 +5,31 @@ type DrawCallback = (schedulerData: SchedulerData, canvas: Canvas) => void;
 type ResizeCallback = (canvas: Canvas) => void;
 
 export type Layer = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
 export const BACKGROUND_LAYER_1 = 0;
 export const BACKGROUND_LAYER_2 = 1;
 export const BACKGROUND_LAYER_3 = 2;
-export const PLAYER_LAYER_UNDERLAY = 3;
-export const PLAYER_LAYER = 4;
-export const PLAYER_LAYER_OVERLAY = 5;
-export const FOREGROUND_LAYER_1 = 6;
-export const FOREGROUND_LAYER_2 = 7;
+export const NPC_LAYER = 3;
+export const PLAYER_LAYER_UNDERLAY = 4;
+export const PLAYER_LAYER = 5;
+export const PLAYER_LAYER_OVERLAY = 6;
+export const FOREGROUND_LAYER = 7;
 
-let currentLayerIndex: number | null = null;
+const LAYERS: Layer[] = [
+  BACKGROUND_LAYER_1,
+  BACKGROUND_LAYER_2,
+  BACKGROUND_LAYER_3,
+  NPC_LAYER,
+  PLAYER_LAYER_UNDERLAY,
+  PLAYER_LAYER,
+  PLAYER_LAYER_OVERLAY,
+  FOREGROUND_LAYER,
+];
+
+let currentLayer: Layer | null = null;
 
 const callbacks = {
-  render: new Array<Array<DrawCallback>>([], [], [], [], [], [], []),
+  render: new Array(LAYERS.length).fill(true).map(() => []) as DrawCallback[][],
   resize: [] as Array<ResizeCallback>,
 };
 
@@ -25,7 +37,11 @@ export function handleResize(callback: ResizeCallback) {
   return registerCallbackHelper(callback, callbacks.resize);
 }
 
-export function registerRenderFunction(callback: DrawCallback, layer: Layer) {
+export function getCurrentLayer(): Layer | null {
+  return currentLayer;
+}
+
+export function scheduleRenderWork(callback: DrawCallback, layer: Layer) {
   let layerCallbacks = callbacks.render[layer];
   if (layerCallbacks == null) {
     layerCallbacks = callbacks.render[layer] = [];
@@ -46,7 +62,7 @@ function registerCallbackHelper(callback: Function, callbacks: Function[]) {
 }
 
 export function unregisterAll() {
-  callbacks.render = new Array<Array<DrawCallback>>([], [], [], [], [], [], []);
+  callbacks.render = new Array(LAYERS.length).fill(true).map(() => []);
   callbacks.resize = [];
 }
 
@@ -54,23 +70,21 @@ export function callRenderFunctions(
   canvas: Canvas,
   schedulerData: SchedulerData
 ) {
-  // TODO Respect framerate
+  canvas.clear();
 
-  for (let index = 0; index < callbacks.render.length; index++) {
-    currentLayerIndex = index;
+  LAYERS.forEach((layer, index) => {
+    currentLayer = layer;
 
     const drawCallbacks = callbacks.render[index];
-
     for (const callback of drawCallbacks) {
       callback(schedulerData, canvas);
     }
-  }
+  });
 
-  currentLayerIndex = null;
+  currentLayer = null;
 }
 
-export function callResizeHanlders(canvas: Canvas) {
-  // TODO This causes a flicker for some reason
+export function callResizeHandlers(canvas: Canvas) {
   for (const callback of callbacks.resize) {
     callback(canvas);
   }

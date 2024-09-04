@@ -3,10 +3,11 @@ export type Size = {
   width: number;
 };
 
-export type Velocity = {
+export type Vector = {
   x: number;
   y: number;
 };
 
-// TODO
-export type Vector = Velocity;
+export type Coordinates = Vector;
+
+export type Rect = Size & Coordinates;

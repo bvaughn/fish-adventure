@@ -45,6 +45,7 @@ export function runSetupWork() {
   didRunSetupWork = true;
 }
 
+// TODO We might be able to remove this phase entirely, now that we have pre-render work and lazy-initialization based on the current screen
 export function scheduleSetupWork(callback: SetupCallback) {
   if (didRunSetupWork) {
     callback();

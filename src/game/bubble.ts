@@ -1,5 +1,5 @@
 import { canvas } from "../main";
-import { Layer, registerRenderFunction } from "../scheduling/drawing";
+import { Layer, scheduleRenderWork } from "../scheduling/drawing";
 import { schedulePreloadWork } from "../scheduling/initialization";
 import { Sprite } from "../utils/drawing/Sprites";
 import { createAnimatedSpriteHelper } from "../utils/drawing/spritesheets/createAnimatedSpriteHelper";
@@ -66,7 +66,7 @@ export function addBubble({
     loop: false,
   });
 
-  const unregister = registerRenderFunction((data, canvas) => {
+  const unregister = scheduleRenderWork((data, canvas) => {
     // TODO Wobble left to right
     const deltaTimeInSeconds = data.timeSinceLastFrameMs / 1_000;
 

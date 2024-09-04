@@ -1,11 +1,16 @@
 import { FRAME_RATE } from "../../constants";
+import { getParallaxOffset } from "../../game/sharedState";
 import { Stack } from "../Stack";
 import { assert } from "../assert";
 import { Color, fromRgb } from "./Color";
 import { Sprite } from "./Sprites";
 
+// TODO Optimize so that we don't draw offscreen things
+// Better yet, optimize this in the rendering helpers too
+
 type DrawingState = {
   fill: Color | null;
+  font: string | null;
   stroke: Color | null;
 };
 
@@ -25,6 +30,7 @@ export type Canvas = {
   width: number;
 
   // Modifiers
+  font: (style: string) => void;
   fill: (color: Color) => void;
   noFill: () => void;
   noStroke: () => void;
@@ -39,10 +45,13 @@ export type Canvas = {
     width?: number,
     height?: number
   ) => void;
+  drawText: (x: number, y: number, text: string) => void;
   line: (x1: number, y1: number, x2: number, y2: number) => void;
   rect: (x: number, y: number, width: number, height: number) => void;
 };
 
+// TODO Are we using this?
+// Should we use this for double buffering? (Would it help with the flickering?)
 export const offscreenCanvas = document.createElement("canvas");
 export const offscreenContext = offscreenCanvas.getContext(
   "2d"
@@ -75,6 +84,7 @@ export function createCanvas({
 
   const drawingStateStack = new Stack<DrawingState>({
     fill: null,
+    font: null,
     stroke: null,
   });
 
@@ -112,6 +122,9 @@ export function createCanvas({
     fill(color: Color) {
       drawingStateStack.getCurrent().fill = color;
     },
+    font(style: string) {
+      drawingStateStack.getCurrent().font = style;
+    },
     noFill() {
       drawingStateStack.getCurrent().fill = null;
     },
@@ -133,6 +146,8 @@ export function createCanvas({
       width?: number,
       height?: number
     ) {
+      x += getParallaxOffset();
+
       context.drawImage(
         sprite,
         x,
@@ -141,7 +156,29 @@ export function createCanvas({
         height ?? sprite.height
       );
     },
+    drawText(x: number, y: number, text: string) {
+      x += getParallaxOffset();
+
+      const { fill, font, stroke } = drawingStateStack.getCurrent();
+
+      if ((fill != null || stroke != null) && font != null) {
+        context.font = font;
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        if (stroke != null) {
+          context.strokeStyle = stroke.value;
+          context.strokeText(text, x, y);
+        }
+        if (fill != null) {
+          context.fillStyle = fill.value;
+          context.fillText(text, x, y);
+        }
+      }
+    },
     line(x1: number, y1: number, x2: number, y2: number) {
+      x1 += getParallaxOffset();
+      x2 += getParallaxOffset();
+
       const { stroke } = drawingStateStack.getCurrent();
 
       if (stroke != null) {
@@ -153,6 +190,8 @@ export function createCanvas({
       }
     },
     rect(x: number, y: number, width: number, height: number) {
+      x += getParallaxOffset();
+
       const { fill, stroke } = drawingStateStack.getCurrent();
 
       context.beginPath();

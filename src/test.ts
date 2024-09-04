@@ -4,8 +4,12 @@ import {
   callRenderFunctions,
   PLAYER_LAYER,
   PLAYER_LAYER_UNDERLAY,
-  registerRenderFunction,
+  scheduleRenderWork,
 } from "./scheduling/drawing";
+import {
+  runNPCPreRenderCallbacks,
+  runPlayerPreRenderCallbacks,
+} from "./scheduling/gameLogic";
 import {
   runPreloadWork,
   runSetupWork,
@@ -61,12 +65,12 @@ export function showTestHarness() {
     let xPosition = 25;
     let yPosition = 25;
 
-    registerRenderFunction((data, canvas) => {
+    scheduleRenderWork((data, canvas) => {
       canvas.fill(fromHex("#008ca7"));
       canvas.rect(0, 0, canvas.width, canvas.height);
     }, BACKGROUND_LAYER_1);
 
-    registerRenderFunction((data, canvas) => {
+    scheduleRenderWork((data, canvas) => {
       xPosition = PADDING;
 
       canvas.drawSprite(
@@ -83,7 +87,7 @@ export function showTestHarness() {
       xPosition += playerSpriteSheet.size.width + PADDING;
     }, PLAYER_LAYER);
 
-    registerRenderFunction((data, canvas) => {
+    scheduleRenderWork((data, canvas) => {
       animationFrameHelpers.forEach((animationHelper) => {
         const sprite = animationHelper.getFrame();
         canvas.drawSprite(sprite, xPosition, yPosition);
@@ -100,6 +104,8 @@ async function initScheduler() {
   await runPreloadWork();
   runSetupWork();
   schedule((data) => {
+    runNPCPreRenderCallbacks(data);
+    runPlayerPreRenderCallbacks(data);
     callRenderFunctions(canvas, data);
   });
   reset();
