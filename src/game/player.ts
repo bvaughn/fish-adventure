@@ -24,10 +24,6 @@ const FULL_VELOCITY = 250;
 const TIME_TO_STOP_FROM_FRICTION = 1_000;
 const TIME_TO_REACH_FULL_VELOCITY = 500;
 
-// TODO Move motion/location processing out of drawing methods
-// Player and NPC positions and velocity should be updated before drawing
-// So that everything draws in-sync regardless of layering order
-
 export function initPlayer() {
   const animatedSpriteHelper = createAnimatedFishSpriteHelper({
     size: {
@@ -117,7 +113,12 @@ export function initPlayer() {
   });
 
   scheduleRenderWork((data, canvas) => {
-    const sprite = animatedSpriteHelper.getSprite(direction, velocity.x !== 0);
+    const sprite = animatedSpriteHelper.getSprite(
+      direction,
+      velocity.x !== 0, // Is moving
+      (velocity.x > 0 && acceleration.x < 0) ||
+        (velocity.x < 0 && acceleration.x > 0) // Is turning
+    );
 
     canvas.drawSprite(sprite, position.x, position.y);
 

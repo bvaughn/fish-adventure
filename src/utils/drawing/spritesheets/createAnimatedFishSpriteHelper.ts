@@ -16,8 +16,6 @@ export type AnimatedFishSpriteHelper = {
   size: Size;
 };
 
-// TODO Add turning-around frame(s)
-
 export function createAnimatedFishSpriteHelper({
   source,
   size,
@@ -88,14 +86,32 @@ export function createAnimatedFishSpriteHelper({
   });
 
   return {
-    getSprite(direction: "forward" | "backward", isMoving: boolean) {
-      return direction === "forward"
-        ? isMoving
-          ? animationHelpers.forward.moving.getFrame()
-          : animationHelpers.forward.still.getFrame()
-        : isMoving
-          ? animationHelpers.backward.moving.getFrame()
-          : animationHelpers.backward.still.getFrame();
+    getSprite(
+      direction: "forward" | "backward",
+      isMoving: boolean,
+      isTurning: boolean
+    ): Sprite {
+      if (direction === "forward") {
+        if (isMoving) {
+          if (isTurning) {
+            return spriteSheet.getSpriteInCell(4, 1);
+          } else {
+            return animationHelpers.forward.moving.getFrame();
+          }
+        } else {
+          return animationHelpers.forward.still.getFrame();
+        }
+      } else {
+        if (isMoving) {
+          if (isTurning) {
+            return spriteSheet.getSpriteInCell(4, 0);
+          } else {
+            return animationHelpers.backward.moving.getFrame();
+          }
+        } else {
+          return animationHelpers.backward.still.getFrame();
+        }
+      }
     },
     get size() {
       return size;
