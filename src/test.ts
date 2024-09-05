@@ -73,12 +73,12 @@ export function showTestHarness() {
       xPosition = PADDING;
 
       canvas.drawSprite(
-        playerSpriteSheet.getSprite("forward", false),
+        playerSpriteSheet.getSprite("forward", false, false),
         xPosition,
         yPosition
       );
       canvas.drawSprite(
-        playerSpriteSheet.getSprite("forward", true),
+        playerSpriteSheet.getSprite("forward", true, false),
         PADDING,
         yPosition + playerSpriteSheet.size.height + PADDING
       );

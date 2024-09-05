@@ -29,7 +29,6 @@ let variantsOnScreen: Map<Variant, number> = new Map();
 
 export function addNPC(variant: Variant, respawn = false) {
   if (variantsOnScreen.has(variant)) {
-    // TODO
     // console.debug(
     //   `Cannot render ${variant} NPC; already on screen with id ${variantsOnScreen.get(variant)}`
     // );
@@ -94,7 +93,8 @@ export function addNPC(variant: Variant, respawn = false) {
   const unscheduleRenderWork = scheduleRenderWork((data, canvas) => {
     const sprite = helper.getSprite();
     if (!position) {
-      debugger;
+      console.warn(`No position for NPC ${uid}`);
+      return;
     }
     canvas.drawSprite(sprite, position.x, position.y);
 

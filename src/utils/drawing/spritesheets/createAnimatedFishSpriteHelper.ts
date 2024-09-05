@@ -12,7 +12,11 @@ import { createSpritesFromGrid } from "./createSpritesFromGrid";
 import { GridSpriteSheet } from "./types";
 
 export type AnimatedFishSpriteHelper = {
-  getSprite(direction: "forward" | "backward", isMoving: boolean): Sprite;
+  getSprite(
+    direction: "forward" | "backward",
+    isMoving: boolean,
+    isTurning: boolean
+  ): Sprite;
   size: Size;
 };
 

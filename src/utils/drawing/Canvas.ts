@@ -1,7 +1,7 @@
-import { FRAME_RATE } from "../../constants";
 import { getParallaxOffset } from "../../game/sharedState";
 import { Stack } from "../Stack";
 import { assert } from "../assert";
+import { configureCanvasSizeAndDpi } from "../canvas";
 import { Color, fromRgb } from "./Color";
 import { Sprite } from "./Sprites";
 
@@ -15,7 +15,6 @@ type DrawingState = {
 };
 
 export type Canvas = {
-  frameRate: (fps: number) => void;
   popDrawingState: () => void;
   pushDrawingState: () => void;
   resize: (width: number, height: number) => void;
@@ -50,30 +49,18 @@ export type Canvas = {
   rect: (x: number, y: number, width: number, height: number) => void;
 };
 
-// TODO Are we using this?
-// Should we use this for double buffering? (Would it help with the flickering?)
-export const offscreenCanvas = document.createElement("canvas");
-export const offscreenContext = offscreenCanvas.getContext(
-  "2d"
-) as CanvasRenderingContext2D;
-
-configureCanvasSizeAndDpi(offscreenCanvas, 800, 600);
-
 export function createCanvas({
-  frameRate = FRAME_RATE,
   height: defaultHeight,
   parentElement = document.body,
   width: defaultWidth,
 }: {
-  frameRate?: number;
   height?: number;
   parentElement?: HTMLElement;
   width?: number;
 } = {}): Canvas {
   const canvas = document.createElement("canvas");
-  const context = canvas.getContext("2d");
-
-  assert(context !== null, "Canvas context is null");
+  const canvasContext = canvas.getContext("2d");
+  assert(canvasContext !== null, "Canvas context is null");
 
   parentElement.appendChild(canvas);
 
@@ -89,9 +76,6 @@ export function createCanvas({
   });
 
   return {
-    frameRate(fps: number) {
-      frameRate = fps;
-    },
     popDrawingState() {
       drawingStateStack.pop();
     },
@@ -137,41 +121,43 @@ export function createCanvas({
 
     // Drawing methods
     clear() {
-      context.clearRect(0, 0, width, height);
+      canvasContext.clearRect(0, 0, width, height);
     },
     drawSprite(
       sprite: Sprite,
       x: number,
       y: number,
-      width?: number,
-      height?: number
+      width: number = sprite.width,
+      height: number = sprite.height
     ) {
       x += getParallaxOffset();
 
-      context.drawImage(
-        sprite,
-        x,
-        y,
-        width ?? sprite.width,
-        height ?? sprite.height
-      );
+      x = Math.round(x);
+      y = Math.round(y);
+      width = Math.round(width);
+      height = Math.round(height);
+
+      canvasContext.drawImage(sprite, x, y, width, height);
     },
     drawText(x: number, y: number, text: string) {
       x += getParallaxOffset();
 
+      x = Math.round(x);
+      y = Math.round(y);
+
       const { fill, font, stroke } = drawingStateStack.getCurrent();
 
       if ((fill != null || stroke != null) && font != null) {
-        context.font = font;
-        context.textAlign = "center";
-        context.textBaseline = "middle";
+        canvasContext.font = font;
+        canvasContext.textAlign = "center";
+        canvasContext.textBaseline = "middle";
         if (stroke != null) {
-          context.strokeStyle = stroke.value;
-          context.strokeText(text, x, y);
+          canvasContext.strokeStyle = stroke.value;
+          canvasContext.strokeText(text, x, y);
         }
         if (fill != null) {
-          context.fillStyle = fill.value;
-          context.fillText(text, x, y);
+          canvasContext.fillStyle = fill.value;
+          canvasContext.fillText(text, x, y);
         }
       }
     },
@@ -179,51 +165,44 @@ export function createCanvas({
       x1 += getParallaxOffset();
       x2 += getParallaxOffset();
 
+      x1 = Math.round(x1);
+      x2 = Math.round(x2);
+      y1 = Math.round(y1);
+      y2 = Math.round(y2);
+
       const { stroke } = drawingStateStack.getCurrent();
 
       if (stroke != null) {
-        context.beginPath();
-        context.moveTo(x1, y1);
-        context.lineTo(x2, y2);
-        context.strokeStyle = stroke.value;
-        context.stroke();
+        canvasContext.beginPath();
+        canvasContext.moveTo(x1, y1);
+        canvasContext.lineTo(x2, y2);
+        canvasContext.strokeStyle = stroke.value;
+        canvasContext.stroke();
       }
     },
     rect(x: number, y: number, width: number, height: number) {
       x += getParallaxOffset();
 
+      x = Math.round(x);
+      y = Math.round(y);
+      width = Math.round(width);
+      height = Math.round(height);
+
       const { fill, stroke } = drawingStateStack.getCurrent();
 
-      context.beginPath();
+      canvasContext.beginPath();
 
       if (fill != null) {
-        context.fillStyle = fill.value;
-        context.fillRect(x, y, width, height);
+        canvasContext.fillStyle = fill.value;
+        canvasContext.fillRect(x, y, width, height);
       }
 
       if (stroke != null) {
-        context.strokeStyle = stroke.value;
-        context.stroke();
+        canvasContext.strokeStyle = stroke.value;
+        canvasContext.stroke();
       }
     },
   };
-}
-
-function configureCanvasSizeAndDpi(
-  canvas: HTMLCanvasElement,
-  width: number,
-  height: number
-) {
-  const dpi = window.devicePixelRatio;
-
-  canvas.style.width = `${width}px`;
-  canvas.style.height = `${height}px`;
-
-  canvas.width = Math.floor(width * dpi);
-  canvas.height = Math.floor(height * dpi);
-
-  const context = canvas.getContext("2d") as CanvasRenderingContext2D;
-  context.scale(dpi, dpi);
 }
 
 function lerpColor(from: Color, to: Color, amount: number): Color {

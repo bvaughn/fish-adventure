@@ -15,9 +15,6 @@ import { random } from "../utils/random";
 import { addBubbles } from "./bubble";
 import { updatePlayerPosition } from "./sharedState";
 
-// TODO Share more code with initNpcFish
-// Swimming, breathing, etc are all too similar to have this much duplication
-
 const SPRITE_HEIGHT = 13;
 const SPRITE_WIDTH = 26;
 const FULL_VELOCITY = 250;
