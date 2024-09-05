@@ -4,6 +4,7 @@ import { Sprite } from "../Sprites";
 export type AnimatedSpriteHelper = {
   getFrame(): Sprite;
   getFrameIndex(): number;
+  reset: () => void;
 };
 
 export function createAnimatedSpriteHelper({
@@ -47,5 +48,10 @@ export function createAnimatedSpriteHelper({
     return frames[frameIndex];
   }
 
-  return { getFrame, getFrameIndex };
+  function reset() {
+    prevFrameIndex = 0;
+    prevFrameUpdatedAtTime = timestamp;
+  }
+
+  return { getFrame, getFrameIndex, reset };
 }

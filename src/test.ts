@@ -26,7 +26,10 @@ import {
   setupNpcFishSprites,
   Variant,
 } from "./utils/drawing/spritesheets/createAnimatedNpcFishSpriteHelper";
-import { AnimatedSpriteHelper } from "./utils/drawing/spritesheets/createAnimatedSpriteHelper";
+import {
+  AnimatedSpriteHelper,
+  createAnimatedSpriteHelper,
+} from "./utils/drawing/spritesheets/createAnimatedSpriteHelper";
 import { SpriteSheet } from "./utils/drawing/spritesheets/types";
 
 const PADDING = 10;
@@ -40,6 +43,7 @@ export function showTestHarness() {
     let animationFrameHelpers: AnimatedSpriteHelper[];
     let npcSpriteSheet: SpriteSheet;
     let playerSpriteSheet: AnimatedFishSpriteHelper;
+    let playerTurningSprite: AnimatedSpriteHelper;
 
     schedulePreloadWork(async () => {
       npcSpriteSheet = preloadNpcFishSprites();
@@ -59,6 +63,32 @@ export function showTestHarness() {
       animationFrameHelpers = NPC_SPRITE_DIMENSIONS.map((_, index) =>
         setupNpcFishSprites((index + 1) as Variant)
       );
+
+      playerTurningSprite = createAnimatedSpriteHelper({
+        frames: [
+          // Swim forward
+          playerSpriteSheet.spriteSheet.getSpriteInCell(2, 0),
+          playerSpriteSheet.spriteSheet.getSpriteInCell(3, 0),
+
+          // Turn around
+          playerSpriteSheet.spriteSheet.getSpriteInCell(4, 0),
+          playerSpriteSheet.spriteSheet.getSpriteInCell(5, 0),
+          playerSpriteSheet.spriteSheet.getSpriteInCell(6, 0),
+          playerSpriteSheet.spriteSheet.getSpriteInCell(7, 0),
+
+          // Swim backward
+          playerSpriteSheet.spriteSheet.getSpriteInCell(3, 1),
+          playerSpriteSheet.spriteSheet.getSpriteInCell(2, 1),
+
+          // Turn around
+          playerSpriteSheet.spriteSheet.getSpriteInCell(4, 1),
+          playerSpriteSheet.spriteSheet.getSpriteInCell(5, 1),
+          playerSpriteSheet.spriteSheet.getSpriteInCell(6, 1),
+          playerSpriteSheet.spriteSheet.getSpriteInCell(7, 1),
+        ],
+        framesPerSecond: 9,
+        loop: true,
+      });
     });
 
     let xPosition = 25;
@@ -73,14 +103,20 @@ export function showTestHarness() {
       xPosition = PADDING;
 
       canvas.drawSprite(
-        playerSpriteSheet.getSprite("forward", false, false),
+        playerSpriteSheet.getSprite("forward", false),
         xPosition,
         yPosition
       );
       canvas.drawSprite(
-        playerSpriteSheet.getSprite("forward", true, false),
+        playerSpriteSheet.getSprite("forward", true),
         PADDING,
         yPosition + playerSpriteSheet.size.height + PADDING
+      );
+
+      canvas.drawSprite(
+        playerTurningSprite.getFrame(),
+        PADDING,
+        yPosition + 2 * (playerSpriteSheet.size.height + PADDING)
       );
 
       xPosition += playerSpriteSheet.size.width + PADDING;

@@ -110,12 +110,7 @@ export function initPlayer() {
   });
 
   scheduleRenderWork((data, canvas) => {
-    const sprite = animatedSpriteHelper.getSprite(
-      direction,
-      velocity.x !== 0, // Is moving
-      (velocity.x > 0 && acceleration.x < 0) ||
-        (velocity.x < 0 && acceleration.x > 0) // Is turning
-    );
+    const sprite = animatedSpriteHelper.getSprite(direction, velocity.x !== 0);
 
     canvas.drawSprite(sprite, position.x, position.y);
 
