@@ -6,6 +6,7 @@ import {
   BACKGROUND_LAYER_3,
   scheduleRenderWork,
 } from "../scheduling/rendering";
+import { Rect } from "../types";
 import { fromHex } from "../utils/drawing/Color";
 import {
   AnimatedSpriteHelper,
@@ -43,9 +44,9 @@ export function initBackground() {
   let featureSpriteSheet: FlatSpriteSheet;
   let hillSpriteSheet: GridSpriteSheet;
   let spriteSheetSmall: GridSpriteSheet;
-  let tilesBG1: TileBG1[] = [];
-  let tilesBG2: TileBG2[] = [];
-  let tilesBG3: TileBG3[] = [];
+  let tilesBG1: Map<number, TileBG1> = new Map();
+  let tilesBG2: Map<number, TileBG2> = new Map();
+  let tilesBG3: Map<number, TileBG3> = new Map();
 
   // Preload sprite sheet images
   schedulePreloadWork(async () => {
@@ -69,8 +70,9 @@ export function initBackground() {
     );
   });
 
-  function getTileBG1(index: number): TileBG1 {
-    while (index > tilesBG1.length - 1) {
+  function getTileBG1(rect: Rect): TileBG1 {
+    let tile = tilesBG1.get(rect.x);
+    if (!tile) {
       const hillWidth = hillSpriteSheet.spriteSize.width;
       const countToRender = Math.ceil(TILE_SIZE / hillWidth);
       const spacing = TILE_SIZE / countToRender;
@@ -85,17 +87,20 @@ export function initBackground() {
         hillPositions.push(x * spacing);
       }
 
-      tilesBG1.push({
+      tile = {
         hillSpriteIndices,
         hillPositions,
-      });
+      };
+
+      tilesBG1.set(rect.x, tile);
     }
 
-    return tilesBG1[index];
+    return tile;
   }
 
-  function getTileBG2(index: number): TileBG2 {
-    while (index > tilesBG2.length - 1) {
+  function getTileBG2(rect: Rect): TileBG2 {
+    let tile = tilesBG2.get(rect.x);
+    if (!tile) {
       const countToRender = Math.ceil(TILE_SIZE / 250) * FEATURES_PER_250_PX;
 
       const featurePositions: number[] = [];
@@ -104,14 +109,17 @@ export function initBackground() {
         featurePositions.push(Math.random());
       }
 
-      tilesBG2.push({ featurePositions });
+      tile = { featurePositions };
+
+      tilesBG2.set(rect.x, tile);
     }
 
-    return tilesBG2[index];
+    return tile;
   }
 
-  function getTileBG3(index: number): TileBG3 {
-    while (index > tilesBG3.length - 1) {
+  function getTileBG3(rect: Rect): TileBG3 {
+    let tile = tilesBG3.get(rect.x);
+    if (!tile) {
       const countToRender = Math.ceil(TILE_SIZE / 250) * SEAWEED_PER_250_PX;
 
       const animatedSpritesSmall: AnimatedSpriteHelper[] = [];
@@ -137,24 +145,27 @@ export function initBackground() {
         spritePositionsSmall.push(Math.random());
       }
 
-      tilesBG3.push({ animatedSpritesSmall, spritePositionsSmall });
+      tile = { animatedSpritesSmall, spritePositionsSmall };
+
+      tilesBG3.set(rect.x, tile);
     }
 
-    return tilesBG3[index];
+    return tile;
   }
 
   scheduleRenderWork((data, canvas) => {
     const visibleTiles = getVisibleTilesForLayer(BACKGROUND_LAYER_1);
-    visibleTiles.rects.forEach((rect, index) => {
-      const { hillPositions, hillSpriteIndices } = getTileBG1(index);
+    visibleTiles.rects.forEach((rect) => {
+      const { hillPositions, hillSpriteIndices } = getTileBG1(rect);
 
       // Fill in the visual space beneath the hills with solid color
+      // Overlap slightly so there's no visible partial line
       canvas.fill(fromHex("#077399"));
       canvas.rect(
         rect.x,
-        rect.height - HILL_MIN_HEIGHT,
+        rect.height - HILL_MIN_HEIGHT - 1,
         rect.width,
-        HILL_MIN_HEIGHT
+        HILL_MIN_HEIGHT + 1
       );
 
       hillSpriteIndices.forEach((spriteIndex, index) => {
@@ -169,8 +180,8 @@ export function initBackground() {
 
   scheduleRenderWork((data, canvas) => {
     const visibleTiles = getVisibleTilesForLayer(BACKGROUND_LAYER_2);
-    visibleTiles.rects.forEach((rect, index) => {
-      const { featurePositions } = getTileBG2(index);
+    visibleTiles.rects.forEach((rect) => {
+      const { featurePositions } = getTileBG2(rect);
 
       featurePositions.forEach((position, index) => {
         const sprite =
@@ -186,8 +197,8 @@ export function initBackground() {
 
   scheduleRenderWork((data, canvas) => {
     const visibleTiles = getVisibleTilesForLayer(BACKGROUND_LAYER_3);
-    visibleTiles.rects.forEach((rect, index) => {
-      const { animatedSpritesSmall, spritePositionsSmall } = getTileBG3(index);
+    visibleTiles.rects.forEach((rect) => {
+      const { animatedSpritesSmall, spritePositionsSmall } = getTileBG3(rect);
 
       for (let index = 0; index < spritePositionsSmall.length; index++) {
         const animated = animatedSpritesSmall[index];

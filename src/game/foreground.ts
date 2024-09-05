@@ -1,6 +1,7 @@
 import { TILE_SIZE } from "../constants";
 import { schedulePreloadWork } from "../scheduling/initialization";
 import { FOREGROUND_LAYER, scheduleRenderWork } from "../scheduling/rendering";
+import { Rect } from "../types";
 import {
   AnimatedSpriteHelper,
   createAnimatedSpriteHelper,
@@ -20,7 +21,7 @@ const SEAWEED_PER_250_PX = 2;
 export function initForeground() {
   let seaweedSpriteSheet: GridSpriteSheet;
   let textureSpriteSheet: GridSpriteSheet;
-  let tiles: Tile[] = [];
+  let tiles: Map<number, Tile> = new Map();
 
   schedulePreloadWork(async () => {
     seaweedSpriteSheet = createSpritesFromGrid(
@@ -39,8 +40,9 @@ export function initForeground() {
     );
   });
 
-  function getTile(index: number): Tile {
-    while (index > tiles.length - 1) {
+  function getTile(rect: Rect): Tile {
+    let tile = tiles.get(rect.x);
+    if (!tile) {
       const animatedSeaweedSprites: AnimatedSpriteHelper[] = [];
       const seaweedPositions: number[] = [];
       const textureIndices: number[] = [];
@@ -74,17 +76,19 @@ export function initForeground() {
         );
       }
 
-      tiles.push({ animatedSeaweedSprites, seaweedPositions, textureIndices });
+      tile = { animatedSeaweedSprites, seaweedPositions, textureIndices };
+
+      tiles.set(rect.x, tile);
     }
 
-    return tiles[index];
+    return tile;
   }
 
   scheduleRenderWork((data, canvas) => {
     const visibleTiles = getVisibleTilesForLayer(FOREGROUND_LAYER);
-    visibleTiles.rects.forEach((rect, index) => {
+    visibleTiles.rects.forEach((rect) => {
       const { animatedSeaweedSprites, seaweedPositions, textureIndices } =
-        getTile(index);
+        getTile(rect);
 
       for (let index = 0; index < seaweedPositions.length; index++) {
         const animated =
