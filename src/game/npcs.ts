@@ -17,7 +17,7 @@ import {
   initAnimatedNpcFishSpriteHelper,
 } from "../utils/drawing/spritesheets/createAnimatedNpcFishSpriteHelper";
 import { random } from "../utils/random";
-import { addBubble } from "./bubble";
+import { addBubbles } from "./bubble";
 import { screen } from "./sharedState";
 
 const POSITION_PADDING = 15;
@@ -111,25 +111,16 @@ export function addNPC(variant: Variant, respawn = false) {
 
     // Simulate breathing with random bubbles every now and then
     // TODO More bubbles when moving faster, less when standing still
-    // TODO Move this code into the createAnimatedFishSpriteHelper?
     if (data.frameNumber % rateOfBreathing === 0) {
-      const numBubbles = Math.round(random(1, 4));
-      for (let i = 0; i < numBubbles; i++) {
-        let x = position.x;
-        x += random(-2, 2);
-
-        let y = position.y;
-        y += random(-2, 2);
-
-        addBubble({
-          layer: NPC_LAYER,
-          partialPosition: { x, y },
-          partialVelocity: {
-            x: velocity.x * 0.001,
-          },
-          size: "regular",
-        });
-      }
+      addBubbles({
+        count: Math.round(random(1, 4)),
+        layer: NPC_LAYER,
+        position,
+        partialVelocity: {
+          x: velocity.x * 0.001,
+        },
+        size: "regular",
+      });
     }
   }, NPC_LAYER);
 }

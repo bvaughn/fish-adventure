@@ -18,7 +18,7 @@ import {
   GridSpriteSheet,
 } from "../utils/drawing/spritesheets/types";
 import { random } from "../utils/random";
-import { addBubble } from "./bubble";
+import { addBubbles } from "./bubble";
 import { getVisibleTilesForLayer } from "./sharedState";
 
 const FEATURES_PER_250_PX = 2;
@@ -205,22 +205,18 @@ export function initBackground() {
     if (data.frameNumber % 100 === 0) {
       const { xStart, xStop } = visibleTiles;
 
-      const numBubbles = Math.round(random(2, 8));
-      const x = Math.round(random(xStart, xStop));
-      const y = canvas.height - random(0, 10);
-      for (let i = 0; i < numBubbles; i++) {
-        addBubble({
-          layer: BACKGROUND_LAYER_3,
-          partialPosition: {
-            x: x + random(-5, 5),
-            y: y + random(-5, 5),
-          },
-          partialVelocity: {
-            y: random(-0.5, -0.25),
-          },
-          size: "bigger",
-        });
-      }
+      addBubbles({
+        count: Math.round(random(2, 8)),
+        layer: BACKGROUND_LAYER_3,
+        position: {
+          x: Math.round(random(xStart, xStop)),
+          y: canvas.height - random(0, 10),
+        },
+        partialVelocity: {
+          y: random(-0.5, -0.25),
+        },
+        size: "bigger",
+      });
     }
   }, BACKGROUND_LAYER_3);
 }

@@ -1,6 +1,7 @@
 import { canvas } from "../main";
-import { Layer, scheduleRenderWork } from "../scheduling/rendering";
 import { schedulePreloadWork } from "../scheduling/initialization";
+import { Layer, scheduleRenderWork } from "../scheduling/rendering";
+import { Vector } from "../types";
 import { Sprite } from "../utils/drawing/Sprites";
 import { createAnimatedSpriteHelper } from "../utils/drawing/spritesheets/createAnimatedSpriteHelper";
 import { createSpritesFromGrid } from "../utils/drawing/spritesheets/createSpritesFromGrid";
@@ -11,6 +12,34 @@ const PIXELS_PER_SECOND = 50;
 
 let bigSpriteSheet: GridSpriteSheet;
 let smallSpriteSheet: GridSpriteSheet;
+
+export function addBubbles({
+  count,
+  layer,
+  position,
+  partialVelocity = {},
+  size,
+}: {
+  count: number;
+  layer: Layer;
+  position: Vector;
+  partialVelocity?: { x?: number; y?: number };
+  size: "bigger" | "regular" | "smaller" | "smallest";
+}) {
+  const randomness = size === "bigger" ? 5 : 2;
+
+  for (let index = 0; index < count; index++) {
+    const x = position.x + random(-randomness, randomness);
+    const y = position.y + random(-randomness, randomness);
+
+    addBubble({
+      layer,
+      partialPosition: { x, y },
+      partialVelocity,
+      size,
+    });
+  }
+}
 
 export function addBubble({
   layer,

@@ -12,7 +12,7 @@ import { createMoveableVector } from "../utils/createMoveableVector";
 import { fromHex } from "../utils/drawing/Color";
 import { createAnimatedFishSpriteHelper } from "../utils/drawing/spritesheets/createAnimatedFishSpriteHelper";
 import { random } from "../utils/random";
-import { addBubble } from "./bubble";
+import { addBubbles } from "./bubble";
 import { updatePlayerPosition } from "./sharedState";
 
 // TODO Share more code with initNpcFish
@@ -133,29 +133,19 @@ export function initPlayer() {
     }
 
     // Simulate breathing with random bubbles every now and then
-    // TODO More bubbles when moving faster, less when standing still
-    // TODO Move this code into the createAnimatedFishSpriteHelper?
     if (data.frameNumber % 45 === 0) {
-      const numBubbles = Math.round(random(2, 8));
-      for (let i = 0; i < numBubbles; i++) {
-        let x = position.x;
-        x += random(-2, 2);
-        if (direction === "forward") {
-          x += SPRITE_HEIGHT; // ???
-        }
-
-        let y = position.y;
-        y += random(-2, 2);
-
-        addBubble({
-          layer: PLAYER_LAYER,
-          partialPosition: { x, y },
-          partialVelocity: {
-            x: velocity.x * 0.001,
-          },
-          size: "regular",
-        });
-      }
+      addBubbles({
+        count: Math.round(random(2, 8)),
+        layer: PLAYER_LAYER,
+        position: {
+          x: direction === "forward" ? position.x + SPRITE_WIDTH : position.x,
+          y: position.y,
+        },
+        partialVelocity: {
+          x: velocity.x * 0.001,
+        },
+        size: "regular",
+      });
     }
   }, PLAYER_LAYER);
 }
