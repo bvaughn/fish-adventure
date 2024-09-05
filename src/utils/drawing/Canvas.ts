@@ -8,9 +8,12 @@ import { Sprite } from "./Sprites";
 // TODO Optimize so that we don't draw offscreen things
 // Better yet, optimize this in the rendering helpers too
 
+type Positioning = "normal" | "static";
+
 type DrawingState = {
   fill: Color | null;
   font: string | null;
+  positioning: Positioning;
   stroke: Color | null;
 };
 
@@ -33,6 +36,7 @@ export type Canvas = {
   fill: (color: Color) => void;
   noFill: () => void;
   noStroke: () => void;
+  positioning(value: Positioning): void;
   stroke: (color: Color) => void;
 
   // Drawing methods
@@ -72,6 +76,7 @@ export function createCanvas({
   const drawingStateStack = new Stack<DrawingState>({
     fill: null,
     font: null,
+    positioning: "normal",
     stroke: null,
   });
 
@@ -115,12 +120,18 @@ export function createCanvas({
     noStroke() {
       drawingStateStack.getCurrent().stroke = null;
     },
+    positioning(value: Positioning) {
+      drawingStateStack.getCurrent().positioning = value;
+    },
     stroke(color: Color) {
       drawingStateStack.getCurrent().stroke = color;
     },
 
     // Drawing methods
     clear() {
+      // width = Math.round(width);
+      // height = Math.round(height);
+
       canvasContext.clearRect(0, 0, width, height);
     },
     drawSprite(
@@ -130,22 +141,29 @@ export function createCanvas({
       width: number = sprite.width,
       height: number = sprite.height
     ) {
-      x += getParallaxOffset();
+      const { positioning } = drawingStateStack.getCurrent();
 
-      x = Math.round(x);
-      y = Math.round(y);
-      width = Math.round(width);
-      height = Math.round(height);
+      if (positioning !== "static") {
+        x += getParallaxOffset();
+      }
+
+      // x = Math.round(x);
+      // y = Math.round(y);
+      // width = Math.round(width);
+      // height = Math.round(height);
 
       canvasContext.drawImage(sprite, x, y, width, height);
     },
     drawText(x: number, y: number, text: string) {
-      x += getParallaxOffset();
+      const { fill, font, positioning, stroke } =
+        drawingStateStack.getCurrent();
 
-      x = Math.round(x);
-      y = Math.round(y);
+      if (positioning !== "static") {
+        x += getParallaxOffset();
+      }
 
-      const { fill, font, stroke } = drawingStateStack.getCurrent();
+      // x = Math.round(x);
+      // y = Math.round(y);
 
       if ((fill != null || stroke != null) && font != null) {
         canvasContext.font = font;
@@ -162,15 +180,17 @@ export function createCanvas({
       }
     },
     line(x1: number, y1: number, x2: number, y2: number) {
-      x1 += getParallaxOffset();
-      x2 += getParallaxOffset();
+      const { positioning, stroke } = drawingStateStack.getCurrent();
 
-      x1 = Math.round(x1);
-      x2 = Math.round(x2);
-      y1 = Math.round(y1);
-      y2 = Math.round(y2);
+      if (positioning !== "static") {
+        x1 += getParallaxOffset();
+        x2 += getParallaxOffset();
+      }
 
-      const { stroke } = drawingStateStack.getCurrent();
+      // x1 = Math.round(x1);
+      // x2 = Math.round(x2);
+      // y1 = Math.round(y1);
+      // y2 = Math.round(y2);
 
       if (stroke != null) {
         canvasContext.beginPath();
@@ -178,17 +198,20 @@ export function createCanvas({
         canvasContext.lineTo(x2, y2);
         canvasContext.strokeStyle = stroke.value;
         canvasContext.stroke();
+        canvasContext.closePath();
       }
     },
     rect(x: number, y: number, width: number, height: number) {
-      x += getParallaxOffset();
+      const { fill, positioning, stroke } = drawingStateStack.getCurrent();
 
-      x = Math.round(x);
-      y = Math.round(y);
-      width = Math.round(width);
-      height = Math.round(height);
+      if (positioning !== "static") {
+        x += getParallaxOffset();
+      }
 
-      const { fill, stroke } = drawingStateStack.getCurrent();
+      // x = Math.round(x);
+      // y = Math.round(y);
+      // width = Math.round(width);
+      // height = Math.round(height);
 
       canvasContext.beginPath();
 
@@ -201,6 +224,8 @@ export function createCanvas({
         canvasContext.strokeStyle = stroke.value;
         canvasContext.stroke();
       }
+
+      canvasContext.closePath();
     },
   };
 }

@@ -119,6 +119,20 @@ export function initPlayer() {
 
     canvas.drawSprite(sprite, position.x, position.y);
 
+    if (position.x + sprite.width + 1 === MAX_OFFSET_X) {
+      canvas.pushDrawingState();
+      canvas.positioning("static");
+      canvas.font("10px sans-serif");
+      canvas.fill(fromHex("#ffffff"));
+      canvas.stroke(fromHex("#000000"));
+      canvas.drawText(
+        canvas.width / 2,
+        canvas.height / 2,
+        "You've reached the end of the map (for now)!"
+      );
+      canvas.popDrawingState();
+    }
+
     if (DEBUG_POSITIONS) {
       canvas.font("6px sans-serif");
       canvas.fill(fromHex("#ffffff"));
