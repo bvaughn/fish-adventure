@@ -96,7 +96,6 @@ export function addBubble({
   });
 
   const unregister = scheduleRenderWork((data, canvas) => {
-    // TODO Wobble left to right
     const deltaTimeInSeconds = data.timeSinceLastFrameMs / 1_000;
 
     position.x += velocity.x * PIXELS_PER_SECOND * deltaTimeInSeconds;

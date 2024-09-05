@@ -20,6 +20,7 @@ import { random } from "../utils/random";
 import { addBubbles } from "./bubble";
 import { screen } from "./sharedState";
 
+const BREATHING_RATE_MS = 2_000;
 const POSITION_PADDING = 15;
 const PIXELS_PER_SECOND_Y = 50;
 const PIXELS_PER_SECOND_X = 100;
@@ -42,7 +43,7 @@ export function addNPC(variant: Variant, respawn = false) {
   const helper = createAnimatedNpcFishSpriteHelper(variant);
 
   const minLocation = { x: 0 - helper.size.width, y: 0 };
-  const rateOfBreathing = Math.round(random(0.5, 1.5) * 45);
+  const rateOfBreathing = Math.round(BREATHING_RATE_MS * random(0.075, 1.25));
 
   let noise = createNoise();
 
@@ -65,30 +66,43 @@ export function addNPC(variant: Variant, respawn = false) {
   });
 
   let position: Vector;
+  let shouldBreathe = false;
+  let timeOfLastBreathe = performance.now();
   let velocity: Vector;
 
-  const unschedulePreRenderUpdate = scheduleNPCPreRenderUpdate(() => {
-    // Use perlin noise to add some speed and depth variation to the fish
-    const perlin = noise.getPerlin2d(moveableVector.getPosition().x * 0.005, 0);
-    if (perlin < 0.05) {
-      moveableVector.setAccelerationX(PIXELS_PER_SECOND_X);
-    } else if (perlin > 0.95) {
-      moveableVector.setAccelerationX(-PIXELS_PER_SECOND_X);
+  const unschedulePreRenderUpdate = scheduleNPCPreRenderUpdate(
+    ({ timestamp }) => {
+      // Use perlin noise to add some speed and depth variation to the fish
+      const perlin = noise.getPerlin2d(
+        moveableVector.getPosition().x * 0.005,
+        0
+      );
+      if (perlin < 0.05) {
+        moveableVector.setAccelerationX(PIXELS_PER_SECOND_X);
+      } else if (perlin > 0.95) {
+        moveableVector.setAccelerationX(-PIXELS_PER_SECOND_X);
+      }
+      moveableVector.setVelocityY((perlin - 0.5) * 25);
+
+      position = moveableVector.getPosition();
+      velocity = moveableVector.getVelocity();
+
+      // Simulate breathing with random bubbles every now and then
+      if (timestamp - timeOfLastBreathe > rateOfBreathing) {
+        shouldBreathe = true;
+        timeOfLastBreathe = timestamp;
+      }
+
+      // Bounds check
+      // Once the fish has moved beyond the rendered area, we can stop updating it
+      if (position.x <= 0 - helper.size.width) {
+        unschedulePreRenderUpdate();
+        unscheduleRenderWork();
+
+        variantsOnScreen.delete(variant);
+      }
     }
-    moveableVector.setVelocityY((perlin - 0.5) * 25);
-
-    position = moveableVector.getPosition();
-    velocity = moveableVector.getVelocity();
-
-    // Bounds check
-    // Once the fish has moved beyond the rendered area, we can stop updating it
-    if (position.x <= 0 - helper.size.width) {
-      unschedulePreRenderUpdate();
-      unscheduleRenderWork();
-
-      variantsOnScreen.delete(variant);
-    }
-  });
+  );
 
   const unscheduleRenderWork = scheduleRenderWork((data, canvas) => {
     const sprite = helper.getSprite();
@@ -109,9 +123,9 @@ export function addNPC(variant: Variant, respawn = false) {
       );
     }
 
-    // Simulate breathing with random bubbles every now and then
-    // TODO More bubbles when moving faster, less when standing still
-    if (data.frameNumber % rateOfBreathing === 0) {
+    if (shouldBreathe) {
+      shouldBreathe = false;
+
       addBubbles({
         count: Math.round(random(1, 4)),
         layer: NPC_LAYER,

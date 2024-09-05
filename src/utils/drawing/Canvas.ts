@@ -5,9 +5,6 @@ import { configureCanvasSizeAndDpi } from "../canvas";
 import { Color, fromRgb } from "./Color";
 import { Sprite } from "./Sprites";
 
-// TODO Optimize so that we don't draw offscreen things
-// Better yet, optimize this in the rendering helpers too
-
 type Positioning = "normal" | "static";
 
 type DrawingState = {

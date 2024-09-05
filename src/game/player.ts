@@ -15,9 +15,11 @@ import { random } from "../utils/random";
 import { addBubbles } from "./bubble";
 import { updatePlayerPosition } from "./sharedState";
 
+const BREATHING_RATE_AT_REST_MS = 2_000;
+const BREATHING_RATE_WHEN_SWIMMING_MS = 1_250;
+const FULL_VELOCITY = 250;
 const SPRITE_HEIGHT = 13;
 const SPRITE_WIDTH = 26;
-const FULL_VELOCITY = 250;
 const TIME_TO_STOP_FROM_FRICTION = 1_000;
 const TIME_TO_REACH_FULL_VELOCITY = 500;
 
@@ -88,9 +90,11 @@ export function initPlayer() {
 
   let acceleration: Vector;
   let position: Vector;
+  let shouldBreathe = false;
+  let timeOfLastBreathe = performance.now();
   let velocity: Vector;
 
-  schedulePlayerPreRenderUpdate(() => {
+  schedulePlayerPreRenderUpdate(({ timestamp }) => {
     acceleration = moveableLocation.getAcceleration();
     position = moveableLocation.getPosition();
     velocity = moveableLocation.getVelocity();
@@ -107,6 +111,19 @@ export function initPlayer() {
       position,
       velocity
     );
+
+    // Breathe a little faster when swimming
+    const velocityAmount = Math.abs(velocity.x) / FULL_VELOCITY;
+    const breathingInterval =
+      BREATHING_RATE_AT_REST_MS -
+      velocityAmount *
+        (BREATHING_RATE_AT_REST_MS - BREATHING_RATE_WHEN_SWIMMING_MS);
+
+    // Simulate breathing with random bubbles every now and then
+    if (timestamp - timeOfLastBreathe > breathingInterval) {
+      shouldBreathe = true;
+      timeOfLastBreathe = timestamp;
+    }
   });
 
   scheduleRenderWork((data, canvas) => {
@@ -139,8 +156,9 @@ export function initPlayer() {
       );
     }
 
-    // Simulate breathing with random bubbles every now and then
-    if (data.frameNumber % 45 === 0) {
+    if (shouldBreathe) {
+      shouldBreathe = false;
+
       addBubbles({
         count: Math.round(random(2, 8)),
         layer: PLAYER_LAYER,
