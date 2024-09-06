@@ -26,10 +26,16 @@ export function getParallaxMultiplierForLayer(layer: Layer): number {
       return -0.1;
     }
     case Layer.BACKGROUND_LAYER_2: {
-      return -0.2;
+      return -0.12;
     }
     case Layer.BACKGROUND_LAYER_3: {
-      return -0.3;
+      return -0.14;
+    }
+    case Layer.BACKGROUND_LAYER_4: {
+      return -0.4;
+    }
+    case Layer.BACKGROUND_LAYER_5: {
+      return -0.5;
     }
     case Layer.NPC_LAYER:
     case Layer.PLAYER_LAYER:
