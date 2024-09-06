@@ -23,7 +23,8 @@ import { addBubbles } from "./bubble";
 import { getVisibleTilesForLayer } from "./sharedState";
 
 const FEATURES_PER_250_PX = 2;
-const HILL_MIN_HEIGHT = 50;
+const HILL_MIN_HEIGHT = 25;
+const SEAWEED_BOTTOM_MARGIN = 4;
 const SEAWEED_PER_250_PX = 2;
 
 type TileBG1 = {
@@ -160,7 +161,7 @@ export function initBackground() {
 
       // Fill in the visual space beneath the hills with solid color
       // Overlap slightly so there's no visible partial line
-      canvas.fill(fromHex("#077399"));
+      canvas.fill(fromHex("#007fcd"));
       canvas.rect(
         rect.x,
         rect.height - HILL_MIN_HEIGHT - 1,
@@ -206,7 +207,7 @@ export function initBackground() {
 
         const position = spritePositionsSmall[index];
         const x = rect.x + position * rect.width;
-        const y = canvas.height - sprite.height;
+        const y = canvas.height - sprite.height - SEAWEED_BOTTOM_MARGIN;
 
         canvas.drawSprite(sprite, x, y);
       }
