@@ -175,7 +175,7 @@ export function initBackground() {
     let yOffset: number;
     switch (layer) {
       case Layer.BACKGROUND_LAYER_1:
-        backgroundColor = fromHex("#0198d3");
+        backgroundColor = fromHex("#0a9bd5");
         rowIndex = 0;
         yOffset = 50;
         break;
