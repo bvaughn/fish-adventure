@@ -175,19 +175,19 @@ export function initBackground() {
     let yOffset: number;
     switch (layer) {
       case Layer.BACKGROUND_LAYER_1:
-        backgroundColor = fromHex("#37aef7");
-        rowIndex = 2;
-        yOffset = 100;
+        backgroundColor = fromHex("#0198d3");
+        rowIndex = 0;
+        yOffset = 50;
         break;
       case Layer.BACKGROUND_LAYER_2:
-        backgroundColor = fromHex("#1a9aea");
+        backgroundColor = fromHex("#018cc4");
         rowIndex = 1;
-        yOffset = 66;
+        yOffset = 15;
         break;
       case Layer.BACKGROUND_LAYER_3:
-        backgroundColor = fromHex("#007fcd");
-        rowIndex = 0;
-        yOffset = 33;
+        backgroundColor = fromHex("#0281b5");
+        rowIndex = 2;
+        yOffset = 0;
         break;
     }
 
