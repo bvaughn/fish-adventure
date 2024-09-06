@@ -43,7 +43,8 @@ export function addNPC(variant: Variant, respawn = false) {
   const helper = createAnimatedNpcFishSpriteHelper(variant);
 
   const minLocation = { x: 0 - helper.size.width, y: 0 };
-  const rateOfBreathing = Math.round(BREATHING_RATE_MS * random(0.075, 1.25));
+  const rateOfBreathing = Math.round(BREATHING_RATE_MS * random(0.75, 1.25));
+  console.log("npc rate-of-breathing:", rateOfBreathing);
 
   let noise = createNoise();
 
