@@ -1,6 +1,6 @@
 import { TILE_SIZE } from "../constants";
 import { schedulePreloadWork } from "../scheduling/initialization";
-import { FOREGROUND_LAYER, scheduleRenderWork } from "../scheduling/rendering";
+import { Layer, scheduleRenderWork } from "../scheduling/rendering";
 import { Rect } from "../types";
 import {
   AnimatedSpriteHelper,
@@ -86,7 +86,7 @@ export function initForeground() {
   }
 
   scheduleRenderWork((data, canvas) => {
-    const visibleTiles = getVisibleTilesForLayer(FOREGROUND_LAYER);
+    const visibleTiles = getVisibleTilesForLayer(Layer.FOREGROUND_LAYER);
     visibleTiles.rects.forEach((rect) => {
       const { animatedSeaweedSprites, seaweedPositions, textureIndices } =
         getTile(rect);
@@ -112,5 +112,5 @@ export function initForeground() {
         canvas.drawSprite(sprite, x, y);
       });
     });
-  }, FOREGROUND_LAYER);
+  }, Layer.FOREGROUND_LAYER);
 }

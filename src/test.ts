@@ -7,9 +7,7 @@ import {
   scheduleSetupWork,
 } from "./scheduling/initialization";
 import {
-  BACKGROUND_LAYER_1,
-  PLAYER_LAYER,
-  PLAYER_LAYER_UNDERLAY,
+  Layer,
   runRenderPipeline,
   scheduleRenderWork,
 } from "./scheduling/rendering";
@@ -97,7 +95,7 @@ export function showTestHarness() {
     scheduleRenderWork((data, canvas) => {
       canvas.fill(fromHex("#008ca7"));
       canvas.rect(0, 0, canvas.width, canvas.height);
-    }, BACKGROUND_LAYER_1);
+    }, Layer.BACKGROUND_LAYER_1);
 
     scheduleRenderWork((data, canvas) => {
       xPosition = PADDING;
@@ -120,7 +118,7 @@ export function showTestHarness() {
       );
 
       xPosition += playerSpriteSheet.size.width + PADDING;
-    }, PLAYER_LAYER);
+    }, Layer.PLAYER_LAYER);
 
     scheduleRenderWork((data, canvas) => {
       animationFrameHelpers.forEach((animationHelper) => {
@@ -129,7 +127,7 @@ export function showTestHarness() {
 
         xPosition += sprite.width + PADDING;
       });
-    }, PLAYER_LAYER_UNDERLAY);
+    }, Layer.PLAYER_LAYER_UNDERLAY);
   }
 
   initScheduler();

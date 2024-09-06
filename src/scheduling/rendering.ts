@@ -5,36 +5,27 @@ type RenderCallback = (schedulerData: SchedulerData, canvas: Canvas) => void;
 type ResizeCallback = (canvas: Canvas) => void;
 type PreRenderCallback = (schedulerData: SchedulerData) => void;
 
-export type Layer = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export enum Layer {
+  BACKGROUND_LAYER_1 = "BACKGROUND_LAYER_1",
+  BACKGROUND_LAYER_2 = "BACKGROUND_LAYER_2",
+  BACKGROUND_LAYER_3 = "BACKGROUND_LAYER_3",
+  BACKGROUND_LAYER_4 = "BACKGROUND_LAYER_4",
+  BACKGROUND_LAYER_5 = "BACKGROUND_LAYER_5",
+  NPC_LAYER = "NPC_LAYER",
+  PLAYER_LAYER_UNDERLAY = "PLAYER_LAYER_UNDERLAY",
+  PLAYER_LAYER = "PLAYER_LAYER",
+  PLAYER_LAYER_OVERLAY = "PLAYER_LAYER_OVERLAY",
+  FOREGROUND_LAYER = "FOREGROUND_LAYER",
+}
 
-export const BACKGROUND_LAYER_1 = 0;
-export const BACKGROUND_LAYER_2 = 1;
-export const BACKGROUND_LAYER_3 = 2;
-export const NPC_LAYER = 3;
-export const PLAYER_LAYER_UNDERLAY = 4;
-export const PLAYER_LAYER = 5;
-export const PLAYER_LAYER_OVERLAY = 6;
-export const FOREGROUND_LAYER = 7;
-
-const LAYERS: Layer[] = [
-  BACKGROUND_LAYER_1,
-  BACKGROUND_LAYER_2,
-  BACKGROUND_LAYER_3,
-  NPC_LAYER,
-  PLAYER_LAYER_UNDERLAY,
-  PLAYER_LAYER,
-  PLAYER_LAYER_OVERLAY,
-  FOREGROUND_LAYER,
-];
+const LAYERS: Layer[] = Object.values(Layer);
 
 let currentLayer: Layer | null = null;
 
 const callbacks = {
   npc: new Set<PreRenderCallback>(),
   player: new Set<PreRenderCallback>(),
-  render: new Array(LAYERS.length)
-    .fill(true)
-    .map(() => new Set<RenderCallback>()),
+  render: new Map<Layer, Set<RenderCallback>>(),
   resize: new Set<ResizeCallback>(),
   scene: new Set<PreRenderCallback>(),
 };
@@ -68,7 +59,13 @@ export function scheduleSceneSetupPreRenderUpdate(callback: PreRenderCallback) {
 }
 
 export function scheduleRenderWork(callback: RenderCallback, layer: Layer) {
-  return registerCallbackHelper(callback, callbacks.render[layer]);
+  let layerCallbacks = callbacks.render.get(layer);
+  if (layerCallbacks == null) {
+    layerCallbacks = new Set();
+    callbacks.render.set(layer, layerCallbacks);
+  }
+
+  return registerCallbackHelper(callback, layerCallbacks);
 }
 
 export function unregisterAll() {
@@ -88,11 +85,13 @@ export function runRenderPipeline(canvas: Canvas) {
   callbacks.npc.forEach((callback) => callback(schedulerData));
   callbacks.player.forEach((callback) => callback(schedulerData));
 
-  LAYERS.forEach((layer, index) => {
+  LAYERS.forEach((layer) => {
     currentLayer = layer;
 
-    const drawCallbacks = callbacks.render[index];
-    drawCallbacks.forEach((callback) => callback(schedulerData, canvas));
+    const drawCallbacks = callbacks.render.get(layer);
+    if (drawCallbacks) {
+      drawCallbacks.forEach((callback) => callback(schedulerData, canvas));
+    }
   });
 
   currentLayer = null;

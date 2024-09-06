@@ -1,18 +1,6 @@
 import { MAX_OFFSET_X, TILE_SIZE } from "../constants";
 import { canvas } from "../main";
-import {
-  BACKGROUND_LAYER_1,
-  BACKGROUND_LAYER_2,
-  BACKGROUND_LAYER_3,
-  FOREGROUND_LAYER,
-  getCurrentLayer,
-  handleResize,
-  Layer,
-  NPC_LAYER,
-  PLAYER_LAYER,
-  PLAYER_LAYER_OVERLAY,
-  PLAYER_LAYER_UNDERLAY,
-} from "../scheduling/rendering";
+import { getCurrentLayer, handleResize, Layer } from "../scheduling/rendering";
 import { Rect, Size, Vector } from "../types";
 
 export type VisibleTiles = {
@@ -34,22 +22,22 @@ export function getParallaxMultiplierForLayer(layer: Layer): number {
   // Higher layers move "faster" to create a parallax effect
   // Everything should move relative to the player layer though
   switch (layer) {
-    case BACKGROUND_LAYER_1: {
+    case Layer.BACKGROUND_LAYER_1: {
       return -0.1;
     }
-    case BACKGROUND_LAYER_2: {
+    case Layer.BACKGROUND_LAYER_2: {
       return -0.2;
     }
-    case BACKGROUND_LAYER_3: {
+    case Layer.BACKGROUND_LAYER_3: {
       return -0.3;
     }
-    case NPC_LAYER:
-    case PLAYER_LAYER:
-    case PLAYER_LAYER_OVERLAY:
-    case PLAYER_LAYER_UNDERLAY: {
+    case Layer.NPC_LAYER:
+    case Layer.PLAYER_LAYER:
+    case Layer.PLAYER_LAYER_OVERLAY:
+    case Layer.PLAYER_LAYER_UNDERLAY: {
       return -1;
     }
-    case FOREGROUND_LAYER: {
+    case Layer.FOREGROUND_LAYER: {
       return -1.1;
     }
     default: {

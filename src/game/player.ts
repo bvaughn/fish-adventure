@@ -2,7 +2,7 @@ import { DEBUG_POSITIONS, MAX_OFFSET_X, TILE_SIZE } from "../constants";
 import { canvas } from "../main";
 import {
   handleResize,
-  PLAYER_LAYER,
+  Layer,
   schedulePlayerPreRenderUpdate,
   scheduleRenderWork,
 } from "../scheduling/rendering";
@@ -167,7 +167,7 @@ export function initPlayer() {
 
       addBubbles({
         count: Math.round(random(2, 8)),
-        layer: PLAYER_LAYER,
+        layer: Layer.PLAYER_LAYER,
         position: {
           x: direction === "forward" ? position.x + SPRITE_WIDTH : position.x,
           y: position.y,
@@ -178,5 +178,5 @@ export function initPlayer() {
         size: "regular",
       });
     }
-  }, PLAYER_LAYER);
+  }, Layer.PLAYER_LAYER);
 }

@@ -2,7 +2,7 @@ import { DEBUG_POSITIONS } from "../constants";
 import { canvas } from "../main";
 import { scheduleSetupWork } from "../scheduling/initialization";
 import {
-  NPC_LAYER,
+  Layer,
   scheduleNPCPreRenderUpdate,
   scheduleRenderWork,
 } from "../scheduling/rendering";
@@ -44,7 +44,6 @@ export function addNPC(variant: Variant, respawn = false) {
 
   const minLocation = { x: 0 - helper.size.width, y: 0 };
   const rateOfBreathing = Math.round(BREATHING_RATE_MS * random(0.75, 1.25));
-  console.log("npc rate-of-breathing:", rateOfBreathing);
 
   let noise = createNoise();
 
@@ -129,7 +128,7 @@ export function addNPC(variant: Variant, respawn = false) {
 
       addBubbles({
         count: Math.round(random(1, 4)),
-        layer: NPC_LAYER,
+        layer: Layer.NPC_LAYER,
         position,
         partialVelocity: {
           x: velocity.x * 0.001,
@@ -137,7 +136,7 @@ export function addNPC(variant: Variant, respawn = false) {
         size: "regular",
       });
     }
-  }, NPC_LAYER);
+  }, Layer.NPC_LAYER);
 }
 
 export function initNPCs() {

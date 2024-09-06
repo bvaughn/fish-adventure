@@ -1,11 +1,6 @@
 import { TILE_SIZE } from "../constants";
 import { schedulePreloadWork } from "../scheduling/initialization";
-import {
-  BACKGROUND_LAYER_1,
-  BACKGROUND_LAYER_2,
-  BACKGROUND_LAYER_3,
-  scheduleRenderWork,
-} from "../scheduling/rendering";
+import { Layer, scheduleRenderWork } from "../scheduling/rendering";
 import { Rect } from "../types";
 import { fromHex } from "../utils/drawing/Color";
 import {
@@ -155,7 +150,7 @@ export function initBackground() {
   }
 
   scheduleRenderWork((data, canvas) => {
-    const visibleTiles = getVisibleTilesForLayer(BACKGROUND_LAYER_1);
+    const visibleTiles = getVisibleTilesForLayer(Layer.BACKGROUND_LAYER_1);
     visibleTiles.rects.forEach((rect) => {
       const { hillPositions, hillSpriteIndices } = getTileBG1(rect);
 
@@ -177,10 +172,10 @@ export function initBackground() {
         canvas.drawSprite(sprite, x, y);
       });
     });
-  }, BACKGROUND_LAYER_1);
+  }, Layer.BACKGROUND_LAYER_1);
 
   scheduleRenderWork((data, canvas) => {
-    const visibleTiles = getVisibleTilesForLayer(BACKGROUND_LAYER_2);
+    const visibleTiles = getVisibleTilesForLayer(Layer.BACKGROUND_LAYER_2);
     visibleTiles.rects.forEach((rect) => {
       const { featurePositions } = getTileBG2(rect);
 
@@ -194,10 +189,10 @@ export function initBackground() {
         canvas.drawSprite(sprite, x, y);
       });
     });
-  }, BACKGROUND_LAYER_2);
+  }, Layer.BACKGROUND_LAYER_2);
 
   scheduleRenderWork((data, canvas) => {
-    const visibleTiles = getVisibleTilesForLayer(BACKGROUND_LAYER_3);
+    const visibleTiles = getVisibleTilesForLayer(Layer.BACKGROUND_LAYER_3);
     visibleTiles.rects.forEach((rect) => {
       const { animatedSpritesSmall, spritePositionsSmall } = getTileBG3(rect);
 
@@ -219,7 +214,7 @@ export function initBackground() {
 
       addBubbles({
         count: Math.round(random(2, 8)),
-        layer: BACKGROUND_LAYER_3,
+        layer: Layer.BACKGROUND_LAYER_3,
         position: {
           x: Math.round(random(xStart, xStop)),
           y: canvas.height - random(0, 10),
@@ -230,5 +225,5 @@ export function initBackground() {
         size: "bigger",
       });
     }
-  }, BACKGROUND_LAYER_3);
+  }, Layer.BACKGROUND_LAYER_3);
 }
