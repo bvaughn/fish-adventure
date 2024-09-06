@@ -1,4 +1,4 @@
-import { DEBUG_POSITIONS, MAX_OFFSET_X } from "../constants";
+import { DEBUG_POSITIONS, MAX_OFFSET_X, TILE_SIZE } from "../constants";
 import { canvas } from "../main";
 import {
   handleResize,
@@ -112,6 +112,12 @@ export function initPlayer() {
       velocity
     );
 
+    // Bounce off the max location, like there's some kind of invisible current
+    // (We might want to change this eventually but...)
+    if (position.x + SPRITE_WIDTH >= MAX_OFFSET_X) {
+      moveableLocation.setVelocityX(0 - FULL_VELOCITY / 2);
+    }
+
     // Breathe a little faster when swimming
     const velocityAmount = Math.abs(velocity.x) / FULL_VELOCITY;
     const breathingInterval =
@@ -131,7 +137,7 @@ export function initPlayer() {
 
     canvas.drawSprite(sprite, position.x, position.y);
 
-    if (position.x + sprite.width + 1 === MAX_OFFSET_X) {
+    if (position.x + TILE_SIZE / 2 >= MAX_OFFSET_X) {
       canvas.pushDrawingState();
       canvas.positioning("static");
       canvas.font("10px sans-serif");

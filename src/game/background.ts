@@ -23,7 +23,7 @@ import { addBubbles } from "./bubble";
 import { getVisibleTilesForLayer } from "./sharedState";
 
 const FEATURES_PER_250_PX = 2;
-const HILL_MIN_HEIGHT = 25;
+const HILL_MIN_HEIGHT = 50;
 const SEAWEED_PER_250_PX = 2;
 
 type TileBG1 = {

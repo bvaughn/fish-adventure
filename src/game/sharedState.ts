@@ -109,9 +109,6 @@ export function updatePlayerPosition(
   position: Vector,
   velocity: Vector
 ) {
-  // TODO Enforce MAX_OFFSET_X for player (and update movable helper somehow)
-  // It would be nice if the player kind of bounced off the min-x/max-x (like the current was too strong)
-
   // Scroll the screen when the player nears either edge
   if (velocity.x > 0) {
     const threshold = screen.x - spriteSize.width + canvas.width * 0.85;

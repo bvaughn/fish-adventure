@@ -16,6 +16,7 @@ type Tile = {
   textureIndices: number[];
 };
 
+const SEAWEED_BOTTOM_MARGIN = 4;
 const SEAWEED_PER_250_PX = 2;
 
 export function initForeground() {
@@ -35,7 +36,7 @@ export function initForeground() {
       "/images/sprites/foreground-texture.gif",
       {
         width: 100,
-        height: 6,
+        height: 8,
       }
     );
   });
@@ -97,7 +98,7 @@ export function initForeground() {
 
         const position = seaweedPositions[index];
         const x = rect.x + position * rect.width;
-        const y = canvas.height - sprite.height;
+        const y = canvas.height - sprite.height - SEAWEED_BOTTOM_MARGIN;
 
         canvas.drawSprite(sprite, x, y);
       }
