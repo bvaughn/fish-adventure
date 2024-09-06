@@ -8,4 +8,4 @@ export const DEBUG_POSITIONS = false;
 export const FRAME_RATE = 30;
 export const MAX_OFFSET_X = 10_000;
 export const PIXEL_SCALE = 2;
-export const TILE_SIZE = 1_000;
+export const TILE_SIZE = 960; // Multiple of bg hill tile width (360)
