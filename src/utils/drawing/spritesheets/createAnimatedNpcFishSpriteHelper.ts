@@ -17,8 +17,8 @@ export type AnimatedFishSpriteHelper = {
   size: Size;
 };
 
-export type Variant = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-export const VARIANTS = new Array(8)
+export type Variant = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+export const VARIANTS = new Array(9)
   .fill(null)
   .map((_, index) => index + 1) as Variant[];
 
@@ -31,6 +31,7 @@ export const NPC_SPRITE_DIMENSIONS = [
   { x: 1, y: 87, width: 21, height: 17, frames: 2 },
   { x: 1, y: 106, width: 26, height: 16, frames: 2 },
   { x: 1, y: 124, width: 26, height: 18, frames: 2 },
+  { x: 1, y: 144, width: 33, height: 20, frames: 2 },
 ];
 
 let animationHelpers: AnimatedSpriteHelper[] = [];
