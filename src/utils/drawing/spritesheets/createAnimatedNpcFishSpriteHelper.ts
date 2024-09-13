@@ -15,12 +15,11 @@ export type AnimatedFishSpriteHelper = {
   getSprite(): Sprite;
   getSpriteIndex(): number;
   size: Size;
+  speedFactor: number;
 };
 
-export type Variant = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-export const VARIANTS = new Array(9)
-  .fill(null)
-  .map((_, index) => index + 1) as Variant[];
+export type Variant = 0 | 1 | 2 | 3 | 4 | 4 | 5 | 6 | 7 | 8 | 9;
+export const VARIANTS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as Variant[];
 
 export const NPC_SPRITE_DIMENSIONS = [
   { x: 1, y: 1, width: 22, height: 9, frames: 2 },
@@ -32,15 +31,26 @@ export const NPC_SPRITE_DIMENSIONS = [
   { x: 1, y: 106, width: 26, height: 16, frames: 2 },
   { x: 1, y: 124, width: 26, height: 18, frames: 2 },
   { x: 1, y: 144, width: 33, height: 20, frames: 2 },
+
+  // Shark
+  {
+    x: 85,
+    y: 1,
+    width: 148,
+    height: 50,
+    frames: 2,
+    direction: "vertical",
+    speedFactor: 1.5,
+  },
 ];
 
 let animationHelpers: AnimatedSpriteHelper[] = [];
 let spriteSheet: SpriteSheet;
 
 export function createAnimatedNpcFishSpriteHelper(variant: Variant) {
-  const { width, height } = NPC_SPRITE_DIMENSIONS[variant - 1];
+  const { speedFactor = 1, height, width } = NPC_SPRITE_DIMENSIONS[variant];
 
-  const animationHelper = animationHelpers[variant - 1];
+  const animationHelper = animationHelpers[variant];
 
   return {
     getSprite() {
@@ -52,6 +62,9 @@ export function createAnimatedNpcFishSpriteHelper(variant: Variant) {
     get size() {
       return { height, width };
     },
+    get speedFactor() {
+      return speedFactor;
+    },
   };
 }
 
@@ -62,31 +75,48 @@ export function initAnimatedNpcFishSpriteHelper() {
 
   scheduleSetupWork(() => {
     animationHelpers = NPC_SPRITE_DIMENSIONS.map((_, index) =>
-      setupNpcFishSprites((index + 1) as Variant)
+      setupNpcFishSprites(index as Variant)
     );
   });
 }
 
 export function preloadNpcFishSprites() {
   spriteSheet = createSprites("/images/sprites/npc-fish.gif", (addSprite) => {
-    NPC_SPRITE_DIMENSIONS.forEach(({ height, width, x, y, frames }) => {
-      for (let frameIndex = 0; frameIndex < frames; frameIndex++) {
-        addSprite(x + frameIndex * (width + 1), y, width, height);
+    NPC_SPRITE_DIMENSIONS.forEach(
+      ({ direction, height, width, x, y, frames }) => {
+        for (let frameIndex = 0; frameIndex < frames; frameIndex++) {
+          switch (direction) {
+            case "vertical": {
+              y = y + frameIndex * (height + 1);
+              break;
+            }
+            default: {
+              x = x + frameIndex * (width + 1);
+              break;
+            }
+          }
+
+          addSprite(x, y, width, height);
+        }
       }
-    });
+    );
   });
 
   return spriteSheet;
 }
 
 export function setupNpcFishSprites(variant: Variant) {
-  const { width, x, y, frames } = NPC_SPRITE_DIMENSIONS[variant - 1];
+  const { direction, height, width, x, y, frames } =
+    NPC_SPRITE_DIMENSIONS[variant];
 
   return createAnimatedSpriteHelper({
     frames: new Array(frames)
       .fill(null)
       .map((_, frameIndex) =>
-        spriteSheet.getSpriteAtCoordinates(x + frameIndex * (width + 1), y)
+        spriteSheet.getSpriteAtCoordinates(
+          direction === "vertical" ? x : x + frameIndex * (width + 1),
+          direction === "vertical" ? y + frameIndex * (height + 1) : y
+        )
       ),
     framesPerSecond: 3,
   });

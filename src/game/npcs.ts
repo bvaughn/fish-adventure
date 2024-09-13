@@ -41,27 +41,35 @@ export function addNPC(variant: Variant, respawn = false) {
   variantsOnScreen.set(variant, uid);
 
   const helper = createAnimatedNpcFishSpriteHelper(variant);
+  const { speedFactor, size } = helper;
 
-  const minLocation = { x: 0 - helper.size.width, y: 0 };
+  const minLocation = { x: 0 - size.width, y: 0 };
   const rateOfBreathing = Math.round(BREATHING_RATE_MS * random(0.75, 1.25));
 
   let noise = createNoise();
 
+  console.log("speedFactor:", speedFactor);
   const moveableVector = createMoveableVector({
     friction: 0,
     initialLocation: {
       x: respawn ? screen.x * 2 + canvas.width : random(0, canvas.width),
       y: random(
         POSITION_PADDING,
-        canvas.height - helper.size.height - POSITION_PADDING
+        canvas.height - size.height - POSITION_PADDING
       ),
     },
     initialVelocity: {
-      x: random(-0.5, -1) * PIXELS_PER_SECOND_X,
+      x: random(-0.5, -1) * PIXELS_PER_SECOND_X * speedFactor,
       y: 0,
     },
-    minVelocity: { x: -PIXELS_PER_SECOND_X, y: -PIXELS_PER_SECOND_Y },
-    maxVelocity: { x: -PIXELS_PER_SECOND_X / 2, y: PIXELS_PER_SECOND_Y },
+    minVelocity: {
+      x: -PIXELS_PER_SECOND_X * speedFactor,
+      y: -PIXELS_PER_SECOND_Y,
+    },
+    maxVelocity: {
+      x: (-PIXELS_PER_SECOND_X / 2) * speedFactor,
+      y: PIXELS_PER_SECOND_Y,
+    },
     minLocation,
   });
 
@@ -78,9 +86,9 @@ export function addNPC(variant: Variant, respawn = false) {
         0
       );
       if (perlin < 0.05) {
-        moveableVector.setAccelerationX(PIXELS_PER_SECOND_X);
+        moveableVector.setAccelerationX(PIXELS_PER_SECOND_X * speedFactor);
       } else if (perlin > 0.95) {
-        moveableVector.setAccelerationX(-PIXELS_PER_SECOND_X);
+        moveableVector.setAccelerationX(-PIXELS_PER_SECOND_X * speedFactor);
       }
       moveableVector.setVelocityY((perlin - 0.5) * 25);
 
@@ -95,7 +103,7 @@ export function addNPC(variant: Variant, respawn = false) {
 
       // Bounds check
       // Once the fish has moved beyond the rendered area, we can stop updating it
-      if (position.x <= 0 - helper.size.width) {
+      if (position.x <= 0 - size.width) {
         unschedulePreRenderUpdate();
         unscheduleRenderWork();
 

@@ -12,7 +12,6 @@ import {
   scheduleRenderWork,
 } from "./scheduling/rendering";
 import { reset, schedule, start } from "./scheduling/scheduler";
-import { fromHex } from "./utils/drawing/Color";
 import {
   AnimatedFishSpriteHelper,
   createAnimatedFishSpriteHelper,
@@ -59,7 +58,7 @@ export function showTestHarness() {
 
     scheduleSetupWork(() => {
       animationFrameHelpers = NPC_SPRITE_DIMENSIONS.map((_, index) =>
-        setupNpcFishSprites((index + 1) as Variant)
+        setupNpcFishSprites(index as Variant)
       );
 
       playerTurningSprite = createAnimatedSpriteHelper({
@@ -91,11 +90,6 @@ export function showTestHarness() {
 
     let xPosition = 25;
     let yPosition = 25;
-
-    scheduleRenderWork((data, canvas) => {
-      canvas.fill(fromHex("#008ca7"));
-      canvas.rect(0, 0, canvas.width, canvas.height);
-    }, Layer.BACKGROUND_LAYER_1);
 
     scheduleRenderWork((data, canvas) => {
       xPosition = PADDING;
